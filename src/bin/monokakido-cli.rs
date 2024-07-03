@@ -1,6 +1,6 @@
 use std::io::Write;
 
-use monokakido::{Error, MonokakidoDict};
+use accent_dict::{Error, MonokakidoDict};
 
 fn print_help() {
     println!("Monokakido CLI. Supported subcommands:");

@@ -4,7 +4,7 @@ use std::{
     io::Write,
 };
 
-use monokakido::{Error, KeyIndex, MonokakidoDict, PageItemId};
+use accent_dict::{Error, KeyIndex, MonokakidoDict, PageItemId};
 
 fn out_dir(dict: &MonokakidoDict) -> String {
     dict.name().to_owned() + "_out/"
