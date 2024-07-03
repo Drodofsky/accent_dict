@@ -5,6 +5,7 @@ mod error;
 mod headline;
 mod key;
 mod pages;
+mod pxml;
 mod resource;
 
 pub use audio::Audio;
