@@ -1,9 +1,3 @@
-use std::{
-    ffi::OsStr,
-    fs,
-    path::{Path, PathBuf},
-};
-
 use crate::{audio::Audio, key::Keys, pages::Pages, Error};
 
 pub struct MonokakidoDict {
