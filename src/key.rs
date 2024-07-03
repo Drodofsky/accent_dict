@@ -1,9 +1,15 @@
 use std::{
-    borrow::Cow, cmp::Ordering, fs::File, io::{Read, Seek}, mem::size_of, path::PathBuf, str::from_utf8
+    borrow::Cow,
+    cmp::Ordering,
+    fs::File,
+    io::{Read, Seek},
+    mem::size_of,
+    path::PathBuf,
+    str::from_utf8,
 };
 
 use crate::{
-    abi_utils::{TransmuteSafe, LE32, read_vec},
+    abi_utils::{read_vec, TransmuteSafe, LE32},
     Error,
 };
 
@@ -91,7 +97,9 @@ pub struct Keys {
 
 impl KeyIndex {
     fn get(&self, i: usize) -> Result<usize, Error> {
-        let Some(index) = &self.index else { return Err(Error::IndexDoesntExist) };
+        let Some(index) = &self.index else {
+            return Err(Error::IndexDoesntExist);
+        };
         let i = i + 1; // Because the the index is prefixed by its legth
         if i >= index.len() {
             return Err(Error::InvalidIndex);
@@ -122,7 +130,9 @@ impl Keys {
 
         file.seek(std::io::SeekFrom::Start(hdr.words_offset.read() as u64))?;
         let words = read_vec(&mut file, hdr.words_offset.us(), hdr.idx_offset.us())?;
-        let Some(words) = words else { return Err(Error::InvalidIndex); };
+        let Some(words) = words else {
+            return Err(Error::InvalidIndex);
+        };
 
         let idx_end = file_size - hdr.idx_offset.us();
         let mut ihdr = IndexHeader::default();

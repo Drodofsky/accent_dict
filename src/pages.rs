@@ -95,7 +95,9 @@ impl Pages {
 
     pub fn get_page(&mut self, id: PageItemId) -> Result<&str, Error> {
         self.init()?;
-        let Some(res) = self.res.as_mut() else { unreachable!() };
+        let Some(res) = self.res.as_mut() else {
+            unreachable!()
+        };
         let xml = std::str::from_utf8(res.get(id.page)?).map_err(|_| Error::Utf8Error)?;
         Ok(xml)
     }
@@ -131,14 +133,18 @@ impl Pages {
 
     pub fn page_by_idx(&mut self, idx: usize) -> Result<(u32, &str), Error> {
         self.init()?;
-        let Some(res) = self.res.as_mut() else { unreachable!() };
+        let Some(res) = self.res.as_mut() else {
+            unreachable!()
+        };
         let (id, page) = res.get_by_idx(idx)?;
         Ok((id, std::str::from_utf8(page).map_err(|_| Error::Utf8Error)?))
     }
 
     pub fn idx_iter(&mut self) -> Result<Range<usize>, Error> {
         self.init()?;
-        let Some(res) = self.res.as_ref() else { unreachable!() };
+        let Some(res) = self.res.as_ref() else {
+            unreachable!()
+        };
         Ok(0..res.len())
     }
 }

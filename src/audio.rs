@@ -19,7 +19,10 @@ enum AudioResource {
 
 impl Audio {
     pub fn new(path: &str) -> Result<Self, Error> {
-            Ok(Audio { path: PathBuf::from(path).join(RSC_NAME), res: None })
+        Ok(Audio {
+            path: PathBuf::from(path).join(RSC_NAME),
+            res: None,
+        })
     }
 
     pub fn init(&mut self) -> Result<(), Error> {
@@ -38,7 +41,9 @@ impl Audio {
 
     pub fn get(&mut self, id: &str) -> Result<&[u8], Error> {
         self.init()?;
-        let Some(res) = self.res.as_mut() else { unreachable!() };
+        let Some(res) = self.res.as_mut() else {
+            unreachable!()
+        };
         match res {
             AudioResource::Rsc(rsc) => rsc.get(id.parse::<u32>().map_err(|_| Error::InvalidIndex)?),
             AudioResource::Nrsc(nrsc) => nrsc.get(id),
@@ -47,7 +52,9 @@ impl Audio {
 
     pub fn get_by_idx(&mut self, idx: usize) -> Result<(AudioId, &[u8]), Error> {
         self.init()?;
-        let Some(res) = self.res.as_mut() else { unreachable!() };
+        let Some(res) = self.res.as_mut() else {
+            unreachable!()
+        };
         Ok(match res {
             AudioResource::Rsc(rsc) => {
                 let (id, page) = rsc.get_by_idx(idx)?;
@@ -62,7 +69,9 @@ impl Audio {
 
     pub fn idx_iter(&mut self) -> Result<Range<usize>, Error> {
         self.init()?;
-        let Some(res) = self.res.as_ref() else { unreachable!() };
+        let Some(res) = self.res.as_ref() else {
+            unreachable!()
+        };
         Ok(0..match res {
             AudioResource::Rsc(rsc) => rsc.len(),
             AudioResource::Nrsc(nrsc) => nrsc.len(),

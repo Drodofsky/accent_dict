@@ -86,7 +86,11 @@ pub(crate) unsafe trait TransmuteSafe: Default + Clone {
     }
 }
 
-pub(crate) fn read_vec<T: TransmuteSafe>(file: &mut File, start: usize, end: usize) -> Result<Option<Vec<T>>, Error> {
+pub(crate) fn read_vec<T: TransmuteSafe>(
+    file: &mut File,
+    start: usize,
+    end: usize,
+) -> Result<Option<Vec<T>>, Error> {
     if start == 0 || end == 0 {
         return Ok(None);
     }

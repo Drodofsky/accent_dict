@@ -58,8 +58,6 @@ fn get_audio(dict_name: &str, id: &str) -> Result<(), Error> {
     Ok(())
 }
 
-
-
 fn main() {
     let mut args = std::env::args();
     let res = match args.nth(1).as_deref() {

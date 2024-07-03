@@ -1,10 +1,11 @@
 use std::{
     fs::File,
-    io::{Read, Seek}, path::PathBuf,
+    io::{Read, Seek},
+    path::PathBuf,
 };
 
 use crate::{
-    abi_utils::{TransmuteSafe, LE32, read_vec},
+    abi_utils::{read_vec, TransmuteSafe, LE32},
     Error, PageItemId,
 };
 
@@ -71,22 +72,30 @@ impl Headlines {
         hdr.validate()?;
 
         file.seek(std::io::SeekFrom::Start(hdr.words_offset.read() as u64))?;
-        let offsets: Option<Vec<Offset>> = read_vec(&mut file, hdr.rec_offset.us(), hdr.words_offset.us())?;
-        let Some(recs) = offsets else { return Err(Error::InvalidIndex); };
+        let offsets: Option<Vec<Offset>> =
+            read_vec(&mut file, hdr.rec_offset.us(), hdr.words_offset.us())?;
+        let Some(recs) = offsets else {
+            return Err(Error::InvalidIndex);
+        };
 
         let words: Option<Vec<u8>> = read_vec(&mut file, hdr.words_offset.us(), file_size)?;
-        let Some(words) = words else { return Err(Error::InvalidIndex); };
+        let Some(words) = words else {
+            return Err(Error::InvalidIndex);
+        };
 
-        Ok(Headlines {
-            recs,
-            words,
-        })
+        Ok(Headlines { recs, words })
     }
 
     pub fn get(&self, id: PageItemId) -> Result<String, Error> {
-        let rec = self.recs.binary_search_by(|rec|
-            rec.page_id.read().cmp(&id.page).then(rec.item_id.cmp(&id.item))
-        ).map_err(|_| Error::InvalidIndex)?;
+        let rec = self
+            .recs
+            .binary_search_by(|rec| {
+                rec.page_id
+                    .read()
+                    .cmp(&id.page)
+                    .then(rec.item_id.cmp(&id.item))
+            })
+            .map_err(|_| Error::InvalidIndex)?;
         todo!();
     }
 }
