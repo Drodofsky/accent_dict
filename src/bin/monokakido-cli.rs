@@ -4,13 +4,13 @@ use accent_dict::{Error, MonokakidoDict};
 
 fn print_help() {
     println!("Monokakido CLI. Supported subcommands:");
-    println!("list_items {{dict}} {{keyword}} - lists all items");
-    println!("list_audio {{dict}} {{keyword}} - lists all audio files");
-    println!("get_audio {{dict}} {{id}} - writes an audio file to stdout");
+    println!("list_items {{keyword}} - lists all items");
+    println!("list_audio {{keyword}} - lists all audio files");
+    println!("get_audio {{id}} - writes an audio file to stdout");
     println!("help - this help");
 }
 
-fn list_items(dict_name: &str, keyword: &str) -> Result<(), Error> {
+fn list_items(keyword: &str) -> Result<(), Error> {
     let mut dict = MonokakidoDict::open()?;
     let (_, items) = dict.keys.search_exact(keyword)?;
 
@@ -21,7 +21,7 @@ fn list_items(dict_name: &str, keyword: &str) -> Result<(), Error> {
     Ok(())
 }
 
-fn list_pages(dict_name: &str, keyword: &str) -> Result<(), Error> {
+fn list_pages(keyword: &str) -> Result<(), Error> {
     let mut dict = MonokakidoDict::open()?;
     let (_, items) = dict.keys.search_exact(keyword)?;
 
@@ -32,7 +32,7 @@ fn list_pages(dict_name: &str, keyword: &str) -> Result<(), Error> {
     Ok(())
 }
 
-fn list_audio(dict_name: &str, keyword: &str) -> Result<(), Error> {
+fn list_audio(keyword: &str) -> Result<(), Error> {
     let mut dict = MonokakidoDict::open()?;
     let (_, items) = dict.keys.search_exact(keyword)?;
 
@@ -48,7 +48,7 @@ fn list_audio(dict_name: &str, keyword: &str) -> Result<(), Error> {
     Ok(())
 }
 
-fn get_audio(dict_name: &str, id: &str) -> Result<(), Error> {
+fn get_audio(id: &str) -> Result<(), Error> {
     let id = id.strip_suffix(".aac").unwrap_or(id);
     let mut dict = MonokakidoDict::open()?;
     let aac = dict.audio.get(id)?;
@@ -62,29 +62,29 @@ fn main() {
     let mut args = std::env::args();
     let res = match args.nth(1).as_deref() {
         Some("list_audio") => {
-            if let (Some(dict_name), Some(keyword)) = (args.next(), args.next()) {
-                list_audio(&dict_name, &keyword)
+            if let Some(keyword) = args.next() {
+                list_audio(&keyword)
             } else {
                 Err(Error::InvalidArg)
             }
         }
         Some("get_audio") => {
-            if let (Some(dict_name), Some(id)) = (args.next(), args.next()) {
-                get_audio(&dict_name, &id)
+            if let Some(id) = args.next() {
+                get_audio(&id)
             } else {
                 Err(Error::InvalidArg)
             }
         }
         Some("list_items") => {
-            if let (Some(dict_name), Some(keyword)) = (args.next(), args.next()) {
-                list_items(&dict_name, &keyword)
+            if let Some(keyword) = args.next() {
+                list_items(&keyword)
             } else {
                 Err(Error::InvalidArg)
             }
         }
         Some("list_pages") => {
-            if let (Some(dict_name), Some(keyword)) = (args.next(), args.next()) {
-                list_pages(&dict_name, &keyword)
+            if let Some(keyword) = args.next() {
+                list_pages(&keyword)
             } else {
                 Err(Error::InvalidArg)
             }
