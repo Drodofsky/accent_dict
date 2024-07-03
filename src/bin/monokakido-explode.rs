@@ -7,7 +7,7 @@ use std::{
 use accent_dict::{Error, KeyIndex, MonokakidoDict, PageItemId};
 
 fn out_dir(dict: &MonokakidoDict) -> String {
-    dict.name().to_owned() + "_out/"
+     "_out/".into()
 }
 
 fn write_index(dict: &MonokakidoDict, index: &KeyIndex, tsv_fname: &str) -> Result<(), Error> {
@@ -29,7 +29,7 @@ fn write_index(dict: &MonokakidoDict, index: &KeyIndex, tsv_fname: &str) -> Resu
 fn explode() -> Result<(), Error> {
     let arg = std::env::args().nth(1).ok_or(Error::InvalidArg)?;
 
-    let mut dict = MonokakidoDict::open(&arg)?;
+    let mut dict = MonokakidoDict::open()?;
 
     let pages_dir = out_dir(&dict) + "pages/";
     let audio_dir = out_dir(&dict) + "audio/";
@@ -44,7 +44,7 @@ fn explode() -> Result<(), Error> {
         file.write_all(page.as_bytes())?;
     }
 
-    if let Some(audio) = &mut dict.audio {
+        let  audio = &mut dict.audio;
         create_dir_all(&audio_dir)?;
         let mut path = String::from(&audio_dir);
         for idx in audio.idx_iter()? {
@@ -54,7 +54,7 @@ fn explode() -> Result<(), Error> {
             path.truncate(audio_dir.len());
             file.write_all(audio)?;
         }
-    }
+    
 
     write_index(&dict, &dict.keys.index_len, "index_len.tsv")?;
     write_index(&dict, &dict.keys.index_prefix, "index_prefix.tsv")?;

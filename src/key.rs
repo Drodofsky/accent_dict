@@ -1,15 +1,9 @@
 use std::{
-    borrow::Cow,
-    cmp::Ordering,
-    fs::File,
-    io::{Read, Seek},
-    mem::size_of,
-    str::from_utf8,
+    borrow::Cow, cmp::Ordering, fs::File, io::{Read, Seek}, mem::size_of, path::PathBuf, str::from_utf8
 };
 
 use crate::{
     abi_utils::{TransmuteSafe, LE32, read_vec},
-    dict::Paths,
     Error,
 };
 
@@ -119,8 +113,8 @@ impl Keys {
         Ok(())
     }
 
-    pub fn new(paths: &Paths) -> Result<Keys, Error> {
-        let mut file = File::open(paths.key_headword_path())?;
+    pub fn new(path: &str) -> Result<Keys, Error> {
+        let mut file = File::open(PathBuf::from(path).join("key/").join("headword.keyindex"))?;
         let file_size = file.metadata()?.len() as usize;
         let mut hdr = FileHeader::default();
         file.read_exact(hdr.as_bytes_mut())?;

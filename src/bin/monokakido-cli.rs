@@ -4,7 +4,6 @@ use accent_dict::{Error, MonokakidoDict};
 
 fn print_help() {
     println!("Monokakido CLI. Supported subcommands:");
-    println!("list - lists all dictionaries installed in the standard path");
     println!("list_items {{dict}} {{keyword}} - lists all items");
     println!("list_audio {{dict}} {{keyword}} - lists all audio files");
     println!("get_audio {{dict}} {{id}} - writes an audio file to stdout");
@@ -12,7 +11,7 @@ fn print_help() {
 }
 
 fn list_items(dict_name: &str, keyword: &str) -> Result<(), Error> {
-    let mut dict = MonokakidoDict::open(dict_name)?;
+    let mut dict = MonokakidoDict::open()?;
     let (_, items) = dict.keys.search_exact(keyword)?;
 
     for id in items {
@@ -23,7 +22,7 @@ fn list_items(dict_name: &str, keyword: &str) -> Result<(), Error> {
 }
 
 fn list_pages(dict_name: &str, keyword: &str) -> Result<(), Error> {
-    let mut dict = MonokakidoDict::open(dict_name)?;
+    let mut dict = MonokakidoDict::open()?;
     let (_, items) = dict.keys.search_exact(keyword)?;
 
     for id in items {
@@ -34,7 +33,7 @@ fn list_pages(dict_name: &str, keyword: &str) -> Result<(), Error> {
 }
 
 fn list_audio(dict_name: &str, keyword: &str) -> Result<(), Error> {
-    let mut dict = MonokakidoDict::open(dict_name)?;
+    let mut dict = MonokakidoDict::open()?;
     let (_, items) = dict.keys.search_exact(keyword)?;
 
     for id in items {
@@ -51,20 +50,15 @@ fn list_audio(dict_name: &str, keyword: &str) -> Result<(), Error> {
 
 fn get_audio(dict_name: &str, id: &str) -> Result<(), Error> {
     let id = id.strip_suffix(".aac").unwrap_or(id);
-    let mut dict = MonokakidoDict::open(dict_name)?;
-    let aac = dict.audio.as_mut().ok_or(Error::MissingAudio)?.get(id)?;
+    let mut dict = MonokakidoDict::open()?;
+    let aac = dict.audio.get(id)?;
     let mut stdout = std::io::stdout().lock();
     // TODO: for ergonomics/failsafe, check if stdout is a TTY
     stdout.write_all(aac)?;
     Ok(())
 }
 
-fn list_dicts() -> Result<(), Error> {
-    for dict in MonokakidoDict::list()? {
-        println!("{}", dict?);
-    }
-    Ok(())
-}
+
 
 fn main() {
     let mut args = std::env::args();
@@ -97,7 +91,6 @@ fn main() {
                 Err(Error::InvalidArg)
             }
         }
-        Some("list") => list_dicts(),
         None | Some("help") => {
             print_help();
             Ok(())

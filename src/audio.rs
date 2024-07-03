@@ -1,7 +1,6 @@
 use std::{fmt::Display, ops::Range, path::PathBuf};
 
 use crate::{
-    dict::Paths,
     resource::{Nrsc, Rsc},
     Error,
 };
@@ -19,14 +18,8 @@ enum AudioResource {
 }
 
 impl Audio {
-    pub fn new(paths: &Paths) -> Result<Option<Self>, Error> {
-        let mut path = paths.contents_path();
-        path.push(RSC_NAME);
-        Ok(if path.exists() {
-            Some(Audio { path, res: None })
-        } else {
-            None
-        })
+    pub fn new(path: &str) -> Result<Self, Error> {
+            Ok(Audio { path: PathBuf::from(path).join(RSC_NAME), res: None })
     }
 
     pub fn init(&mut self) -> Result<(), Error> {

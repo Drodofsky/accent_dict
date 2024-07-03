@@ -1,6 +1,6 @@
 use std::{ops::Range, path::PathBuf};
 
-use crate::{dict::Paths, resource::Rsc, Error, PageItemId};
+use crate::{resource::Rsc, Error, PageItemId};
 
 const RSC_NAME: &str = "contents";
 
@@ -79,9 +79,9 @@ impl<'a> XmlParser<'a> {
 }
 
 impl Pages {
-    pub fn new(paths: &Paths) -> Result<Self, Error> {
+    pub fn new(path: &str) -> Result<Self, Error> {
         Ok(Pages {
-            path: paths.contents_path().join(RSC_NAME),
+            path: PathBuf::from(path).join(RSC_NAME),
             res: None,
         })
     }

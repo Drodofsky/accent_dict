@@ -1,11 +1,10 @@
 use std::{
     fs::File,
-    io::{Read, Seek},
+    io::{Read, Seek}, path::PathBuf,
 };
 
 use crate::{
     abi_utils::{TransmuteSafe, LE32, read_vec},
-    dict::Paths,
     Error, PageItemId,
 };
 
@@ -64,8 +63,8 @@ pub struct Headlines {
 }
 
 impl Headlines {
-    pub fn new(paths: &Paths) -> Result<Headlines, Error> {
-        let mut file = File::open(paths.headline_long_path())?;
+    pub fn new(path: &str) -> Result<Headlines, Error> {
+        let mut file = File::open(PathBuf::from(path).join("headline/").join("headline.store"))?;
         let file_size = file.metadata()?.len() as usize;
         let mut hdr = FileHeader::default();
         file.read_exact(hdr.as_bytes_mut())?;
