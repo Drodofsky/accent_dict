@@ -1,6 +1,6 @@
 use std::io::Write;
 
-use accent_dict::{Error, MonokakidoDict};
+use accent_dict::{parse_xml, Error, MonokakidoDict};
 
 fn print_help() {
     println!("Monokakido CLI. Supported subcommands:");
@@ -27,7 +27,8 @@ fn list_pages(keyword: &str) -> Result<(), Error> {
 
     for id in items {
         let page = dict.pages.get_page(id)?;
-        println!("{page}");
+        let parsed = parse_xml(page);
+        println!("{parsed:#?}");
     }
     Ok(())
 }

@@ -14,3 +14,4 @@ pub use error::Error;
 pub use headline::Headlines;
 pub use key::{KeyIndex, Keys, PageItemId};
 pub use pages::{Pages, XmlParser};
+pub use pxml::*;
