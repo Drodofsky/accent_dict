@@ -38,6 +38,7 @@ fn _look_up(path: &str,vocab: &str) -> Vec<String> {
     for id in items {
         let page = dict.pages.get_page(id).unwrap();
         let parsed = parse_xml(page);
+        println!("{parsed:#?}");
         for h in parsed.1 {
             match h.0 {
                 Head::H(h) => heads.push(h.iter().map(|h| format!("{h} ")).collect()),
