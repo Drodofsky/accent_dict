@@ -1,8 +1,8 @@
 mod example;
 mod josushi;
 mod ruby;
-mod xml;
 mod structs;
+mod xml;
 use example::*;
 use josushi::*;
 use nom::{
@@ -17,8 +17,8 @@ use nom::{
 };
 pub use ruby::*;
 use serde::{Deserialize, Serialize};
-pub use xml::*;
 pub use structs::*;
+pub use xml::*;
 
 pub fn parse_xml(xml: &str) -> DicItem {
     let xml = xml

@@ -1,16 +1,33 @@
-use serde::{Serialize,Deserialize};
+use std::fmt;
+
+use serde::{Deserialize, Serialize};
 #[derive(Debug, Serialize, Deserialize)]
-pub struct DicItem(pub Id,pub  Vec<HeadG>,pub  Vec<Josushi>);
+pub struct DicItem(pub Id, pub Vec<HeadG>, pub Vec<Josushi>);
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Id(pub String);
 #[derive(Debug, Serialize, Deserialize)]
-pub struct HeadG(pub Head,pub  Body);
+pub struct HeadG(pub Head, pub Body);
 #[derive(Debug, Serialize, Deserialize)]
 pub enum Head {
     H(Vec<H>),
     Joshiword(Joshiword),
     Ref(Vec<RefHead>),
     None,
+}
+
+impl fmt::Display for Head {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Head::H(h) => {
+                write!(
+                    f,
+                    "{}",
+                    h.iter().map(|h| format!("{h} ")).collect::<String>()
+                )
+            }
+            _ => write!(f, "none"),
+        }
+    }
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -22,7 +39,6 @@ pub enum RefHead {
     SquareBrackets(String),
 }
 
-
 #[derive(Debug, Serialize, Deserialize)]
 pub enum Inner {
     DAngleBrackets(DAngleBrackets),
@@ -30,6 +46,30 @@ pub enum Inner {
     RoundBrackets(String),
     Text(String),
     Span(String),
+}
+
+impl fmt::Display for Inner {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Inner::DAngleBrackets(d) => write!(f, "{d}"),
+            Inner::RoundBrackets(s) => write!(f, "{s}"),
+            Inner::Text(s) => write!(f, "{s}"),
+            Inner::Span(s) => write!(f, "{s}"),
+            Inner::Ruby((ru)) => write!(
+                f,
+                "{}",
+                ru.iter()
+                    .map(|(r, os)| if let Some(mut s) = os.as_deref() {
+                        let mut r = format!("{r}");
+                        r.push_str(s);
+                        r
+                    } else {
+                        format!("{r}")
+                    })
+                    .collect::<String>()
+            ),
+        }
+    }
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -45,15 +85,53 @@ pub enum H {
     AngleBrackets(String),
     Dia(String),
 }
+
+impl fmt::Display for H {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            H::Headword(s) => write!(f, "{s}"),
+            H::SquareBrackets(s) => write!(f, "{s}"),
+            H::RoundBrackets(s) => write!(f, "{s}"),
+            H::SquareBox(s) => write!(f, "{s}"),
+            H::DAngleBrackets(s) => write!(f, "{s}"),
+            H::AngleBrackets(s) => write!(f, "{s}"),
+            H::Dia(s) => write!(f, "{s}"),
+            H::HW(start, inner) => {
+                let mut start = start.clone();
+                if let Some((inn, end)) = inner {
+                    start.push_str(&inn.iter().map(|i| format!("{i}")).collect::<String>());
+                    start.push(*end)
+                }
+                write!(f, "{start}")
+            }
+            H::BlackBranckets(start, inner) => {
+                let mut start = start.clone();
+                if let Some((inn, end)) = inner {
+                    start.push_str(&format!("{inn}"));
+                    start.push(*end)
+                }
+                write!(f, "{start}")
+            }
+            H::Subheadword(n, _s) => write!(f, "{}", n.0),
+        }
+    }
+}
+
 #[derive(Debug, Serialize, Deserialize)]
-pub struct Joshiword(pub Name,pub  String);
+pub struct Joshiword(pub Name, pub String);
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Name(pub String);
 
-
 #[derive(Debug, Serialize, Deserialize)]
 pub struct DAngleBrackets(pub String);
+
+impl fmt::Display for DAngleBrackets {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.0)
+    }
+}
+
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Body(pub Vec<BodyContent>);
 
@@ -82,15 +160,13 @@ pub enum RefContent {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct AccentHead(pub SquareBox);
 
-
-
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Audio(pub String);
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct SquareBox(pub String);
 #[derive(Debug, Serialize, Deserialize)]
-pub struct Accent(pub Option<AccentHead>,pub  Vec<AccentText>);
+pub struct Accent(pub Option<AccentHead>, pub Vec<AccentText>);
 
 #[derive(Debug, Serialize, Deserialize)]
 pub enum AccentText {
@@ -106,12 +182,11 @@ pub enum AccentText {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct RoundBrackets(pub Vec<AccentText>);
 
+#[derive(Debug, Serialize, Deserialize)]
+pub struct ExampleHead(pub Name, pub String);
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct ExampleHead(pub Name,pub  String);
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct Example(pub ExampleHead,pub  Vec<ExampleContent>);
+pub struct Example(pub ExampleHead, pub Vec<ExampleContent>);
 
 #[derive(Debug, Serialize, Deserialize)]
 pub enum ExampleContent {
@@ -120,11 +195,15 @@ pub enum ExampleContent {
     Ref(Id, Vec<RefContent>),
 }
 
-
 #[derive(Debug, Serialize, Deserialize)]
-pub struct Josushi(pub JosushiNumber,pub  Vec<Accent>, pub Vec<Indent>,pub  Option<Notes>);
+pub struct Josushi(
+    pub JosushiNumber,
+    pub Vec<Accent>,
+    pub Vec<Indent>,
+    pub Option<Notes>,
+);
 #[derive(Debug, Serialize, Deserialize)]
-pub struct JosushiNumber(pub Name,pub  String);
+pub struct JosushiNumber(pub Name, pub String);
 
 #[derive(Debug, Serialize, Deserialize)]
 
@@ -145,12 +224,23 @@ pub enum NoteContent {
     Ref(Id, Vec<RefContent>),
 }
 
-
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Rb(pub String);
+
+impl fmt::Display for Rb {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.0)
+    }
+}
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Rt(pub String);
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct Ruby(pub Rb,pub  Rt);
+pub struct Ruby(pub Rb, pub Rt);
+
+impl fmt::Display for Ruby {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.0)
+    }
+}

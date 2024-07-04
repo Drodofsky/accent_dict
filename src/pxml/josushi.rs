@@ -9,7 +9,6 @@ use serde::{Deserialize, Serialize};
 
 use super::*;
 
-
 pub fn parse_josuhi(input: &str) -> IResult<&str, Josushi> {
     xml_tag(
         "div",

@@ -3,7 +3,6 @@ use serde::{Deserialize, Serialize};
 
 use super::*;
 
-
 fn parse_rb(input: &str) -> IResult<&str, Rb> {
     xml_tag("rb", text)(input).map(|(rem, (_attr, rb))| (rem, Rb(rb.into())))
 }
