@@ -5,3 +5,5 @@
 Cargo.lock
 .env/
 .github/
+*.so
+/build_env

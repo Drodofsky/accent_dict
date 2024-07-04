@@ -19,19 +19,19 @@ pub use pages::{Pages, XmlParser};
 pub use pxml::*;
 
 #[pyfunction]
-fn lock_up(vocab: String) -> Py<PyAny> {
-    Python::with_gil(|py| _lock_up(&vocab).to_object(py))
+fn look_up(path: String,vocab: String) -> Py<PyAny> {
+    Python::with_gil(|py| _look_up(&path,&vocab).to_object(py))
 }
 
 /// A Python module implemented in Rust.
 #[pymodule]
 fn accent_dict(m: &Bound<'_, PyModule>) -> PyResult<()> {
-    m.add_function(wrap_pyfunction!(lock_up, m)?)?;
+    m.add_function(wrap_pyfunction!(look_up, m)?)?;
     Ok(())
 }
 
-fn _lock_up(vocab: &str) -> Vec<String> {
-    let mut dict = MonokakidoDict::open().unwrap();
+fn _look_up(path: &str,vocab: &str) -> Vec<String> {
+    let mut dict = MonokakidoDict::open_with_path(path).unwrap();
     let (_, items) = dict.keys.search_exact(vocab).unwrap();
 
     let mut heads = Vec::new();
