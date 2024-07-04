@@ -18,22 +18,19 @@ pub use key::{KeyIndex, Keys, PageItemId};
 pub use pages::{Pages, XmlParser};
 pub use pxml::*;
 
-
-/// Formats the sum of two numbers as string.
 #[pyfunction]
-fn sum_as_string(a: usize, b: usize) -> PyResult<String> {
-    Ok((a + b).to_string())
+fn lock_up(vocab: String) -> Py<PyAny> {
+    Python::with_gil(|py| _lock_up(&vocab).to_object(py))
 }
 
 /// A Python module implemented in Rust.
 #[pymodule]
 fn accent_dict(m: &Bound<'_, PyModule>) -> PyResult<()> {
-    m.add_function(wrap_pyfunction!(sum_as_string, m)?)?;
+    m.add_function(wrap_pyfunction!(lock_up, m)?)?;
     Ok(())
 }
 
-
-pub fn lock_up(vocab: &str) -> Vec<String> {
+fn _lock_up(vocab: &str) -> Vec<String> {
     let mut dict = MonokakidoDict::open().unwrap();
     let (_, items) = dict.keys.search_exact(vocab).unwrap();
 
