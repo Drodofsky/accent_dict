@@ -8,23 +8,7 @@ use nom::{
 };
 use serde::{Deserialize, Serialize};
 
-use super::{
-    parse_body, parse_bodyref, parse_named_word, parse_round_box, parse_sound,
-    parse_square_brackets, parse_symbol_backslash, parse_symbol_macron, text, xml_tag, AccentText,
-    Id, Name, RefContent, VerifyClass,
-};
-#[derive(Debug, Serialize, Deserialize)]
-pub struct ExampleHead(Name, String);
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct Example(ExampleHead, Vec<ExampleContent>);
-
-#[derive(Debug, Serialize, Deserialize)]
-pub enum ExampleContent {
-    AccentExample(Vec<AccentText>),
-    SquareBrackets(String),
-    Ref(Id, Vec<RefContent>),
-}
+use super::*;
 
 pub fn parse_example(input: &str) -> IResult<&str, Example> {
     xml_tag(

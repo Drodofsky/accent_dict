@@ -7,35 +7,8 @@ use nom::{
 };
 use serde::{Deserialize, Serialize};
 
-use super::{
-    empty_xml_tag, parse_accent, parse_accent2, parse_accent_text, parse_bodyref, parse_named_word,
-    parse_round_box, parse_symbol_backslash, parse_symbol_macron, text, xml_tag, Accent,
-    AccentText, Id, Name, RefContent, VerifyClass,
-};
+use super::*;
 
-#[derive(Debug, Serialize, Deserialize)]
-pub struct Josushi(JosushiNumber, Vec<Accent>, Vec<Indent>, Option<Notes>);
-#[derive(Debug, Serialize, Deserialize)]
-pub struct JosushiNumber(Name, String);
-
-#[derive(Debug, Serialize, Deserialize)]
-
-pub struct Indent(Vec<AccentText>);
-#[derive(Debug, Serialize, Deserialize)]
-
-pub struct Notes(Vec<(Option<Num>, Vec<NoteContent>)>);
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct Num(String);
-#[derive(Debug, Serialize, Deserialize)]
-pub enum NoteContent {
-    Text(String),
-    Accent(Accent),
-    SymbolBackslash(String),
-    RoundBox(String),
-    SymbolMacron(String),
-    Ref(Id, Vec<RefContent>),
-}
 
 pub fn parse_josuhi(input: &str) -> IResult<&str, Josushi> {
     xml_tag(

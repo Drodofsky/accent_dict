@@ -2,6 +2,7 @@ mod example;
 mod josushi;
 mod ruby;
 mod xml;
+mod structs;
 use example::*;
 use josushi::*;
 use nom::{
@@ -17,108 +18,7 @@ use nom::{
 pub use ruby::*;
 use serde::{Deserialize, Serialize};
 pub use xml::*;
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct DicItem(Id, Vec<HeadG>, Vec<Josushi>);
-#[derive(Debug, Serialize, Deserialize)]
-pub struct Id(String);
-#[derive(Debug, Serialize, Deserialize)]
-pub struct HeadG(Head, Body);
-#[derive(Debug, Serialize, Deserialize)]
-pub enum Head {
-    H(Vec<H>),
-    Joshiword(Joshiword),
-    Ref(Vec<RefHead>),
-    None,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-pub enum RefHead {
-    Refheadword(String),
-    BlackBranckets(String, Option<(Inner, char)>),
-    DAngleBrackets(String),
-    RoundBrackets(String),
-    SquareBrackets(String),
-}
-#[derive(Debug, Serialize, Deserialize)]
-pub enum Inner {
-    DAngleBrackets(DAngleBrackets),
-    Ruby(Vec<(Ruby, Option<String>)>),
-    RoundBrackets(String),
-    Text(String),
-    Span(String),
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-pub enum H {
-    Headword(String),
-    HW(String, Option<(Vec<Inner>, char)>),
-    SquareBrackets(String),
-    RoundBrackets(String),
-    SquareBox(String),
-    Subheadword(Name, String),
-    BlackBranckets(String, Option<(Inner, char)>),
-    DAngleBrackets(String),
-    AngleBrackets(String),
-    Dia(String),
-}
-#[derive(Debug, Serialize, Deserialize)]
-pub struct Joshiword(Name, String);
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct Name(String);
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct DAngleBrackets(String);
-#[derive(Debug, Serialize, Deserialize)]
-pub struct Body(Vec<BodyContent>);
-
-#[derive(Debug, Serialize, Deserialize)]
-pub enum BodyContent {
-    Accent(Vec<Accent>),
-    AccentRound(RoundBrackets, Option<Audio>),
-    Ref(Id, Vec<RefContent>),
-    ConTable(Vec<ConTableContent>),
-    SquareBox(String),
-    Example(Example),
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-pub enum ConTableContent {
-    Accent(Vec<Accent>),
-    AccentRound(RoundBrackets, Option<Audio>),
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-pub enum RefContent {
-    Text(String),
-    RoundBrackets(String),
-    TextSpan(String),
-}
-#[derive(Debug, Serialize, Deserialize)]
-pub struct AccentHead(SquareBox);
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct Audio(String);
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct SquareBox(String);
-#[derive(Debug, Serialize, Deserialize)]
-pub struct Accent(Option<AccentHead>, Vec<AccentText>);
-
-#[derive(Debug, Serialize, Deserialize)]
-pub enum AccentText {
-    Text(String),
-    SymbolMacron(String),
-    SymbolBackslash(String),
-    RoundBox(String),
-    Sound(String),
-    SquareBox(String),
-    NoteRef(String),
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct RoundBrackets(Vec<AccentText>);
+pub use structs::*;
 
 pub fn parse_xml(xml: &str) -> DicItem {
     let xml = xml

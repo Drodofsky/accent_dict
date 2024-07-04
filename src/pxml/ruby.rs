@@ -1,16 +1,8 @@
 use nom::{combinator::opt, sequence::tuple, IResult, Parser};
 use serde::{Deserialize, Serialize};
 
-use super::{text, xml_tag, VerifyClass};
+use super::*;
 
-#[derive(Debug, Serialize, Deserialize)]
-pub struct Rb(String);
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct Rt(String);
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct Ruby(Rb, Rt);
 
 fn parse_rb(input: &str) -> IResult<&str, Rb> {
     xml_tag("rb", text)(input).map(|(rem, (_attr, rb))| (rem, Rb(rb.into())))
