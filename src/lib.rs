@@ -1,3 +1,5 @@
+use pyo3::prelude::*;
+
 mod abi_utils;
 mod audio;
 mod dict;
@@ -15,6 +17,21 @@ pub use headline::Headlines;
 pub use key::{KeyIndex, Keys, PageItemId};
 pub use pages::{Pages, XmlParser};
 pub use pxml::*;
+
+
+/// Formats the sum of two numbers as string.
+#[pyfunction]
+fn sum_as_string(a: usize, b: usize) -> PyResult<String> {
+    Ok((a + b).to_string())
+}
+
+/// A Python module implemented in Rust.
+#[pymodule]
+fn accent_dict(m: &Bound<'_, PyModule>) -> PyResult<()> {
+    m.add_function(wrap_pyfunction!(sum_as_string, m)?)?;
+    Ok(())
+}
+
 
 pub fn lock_up(vocab: &str) -> Vec<String> {
     let mut dict = MonokakidoDict::open().unwrap();

@@ -3,3 +3,5 @@
 /assets
 *.aac
 Cargo.lock
+.env/
+.github/
