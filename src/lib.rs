@@ -5,6 +5,7 @@ mod audio;
 mod circle;
 mod dict;
 mod error;
+mod gen_svg;
 mod headline;
 mod key;
 mod pages;
@@ -25,6 +26,11 @@ fn look_up(path: String, vocab: String) -> Vec<Unpacked> {
 }
 
 #[pyfunction]
+fn gen_pitch_svg(pitch_pattern: String) -> String {
+    gen_svg::gen_svg(&pitch_pattern)
+}
+
+#[pyfunction]
 fn get_sound(path: String, file_name: String) -> Vec<u8> {
     let file_name = file_name.strip_suffix(".aac").unwrap_or(&file_name);
     let mut dict = MonokakidoDict::open_with_path(&path).unwrap();
@@ -36,6 +42,7 @@ fn get_sound(path: String, file_name: String) -> Vec<u8> {
 fn accent_dict(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(look_up, m)?)?;
     m.add_function(wrap_pyfunction!(get_sound, m)?)?;
+    m.add_function(wrap_pyfunction!(gen_pitch_svg, m)?)?;
     Ok(())
 }
 
