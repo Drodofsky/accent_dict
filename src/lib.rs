@@ -55,6 +55,8 @@ fn _look_up(path: &str, vocab: &str) -> Vec<Unpacked> {
 #[pyclass]
 struct Unpacked {
     #[pyo3(get)]
+    id: String,
+    #[pyo3(get)]
     head: String,
     #[pyo3(get)]
     kanji: Option<String>,
@@ -134,7 +136,12 @@ fn unpack_dic_item(dic_item: DicItem) -> Vec<Unpacked> {
         }
 
         if !head.is_empty() {
-            unpacked.push(Unpacked { head, kanji, pron })
+            unpacked.push(Unpacked {
+                id: dic_item.0 .0.clone(),
+                head,
+                kanji,
+                pron,
+            })
         }
     }
     unpacked
