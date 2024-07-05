@@ -168,6 +168,13 @@ pub struct SquareBox(pub String);
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Accent(pub Option<AccentHead>, pub Vec<AccentText>);
 
+impl fmt::Display for Accent {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let s: String = self.1.iter().map(|s| format!("{s}")).collect();
+        write!(f, "{s}")
+    }
+}
+
 #[derive(Debug, Serialize, Deserialize)]
 pub enum AccentText {
     Text(String),
@@ -177,6 +184,17 @@ pub enum AccentText {
     Sound(String),
     SquareBox(String),
     NoteRef(String),
+}
+
+impl fmt::Display for AccentText {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            AccentText::Text(s) => write!(f, "{s}"),
+            AccentText::SymbolMacron(s) => write!(f, "{s}"),
+            AccentText::SymbolBackslash(s) => write!(f, "{s}"),
+            _ => write!(f, ""),
+        }
+    }
 }
 
 #[derive(Debug, Serialize, Deserialize)]
