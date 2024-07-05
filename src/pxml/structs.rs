@@ -1,6 +1,8 @@
 use std::fmt;
 
 use serde::{Deserialize, Serialize};
+
+use crate::circle::to_circle;
 #[derive(Debug, Serialize, Deserialize)]
 pub struct DicItem(pub Id, pub Vec<HeadG>, pub Vec<Josushi>);
 #[derive(Debug, Serialize, Deserialize)]
@@ -192,6 +194,7 @@ impl fmt::Display for AccentText {
             AccentText::Text(s) => write!(f, "{s}"),
             AccentText::SymbolMacron(s) => write!(f, "{s}"),
             AccentText::SymbolBackslash(s) => write!(f, "{s}"),
+            AccentText::RoundBox(s) => write!(f, "{}", to_circle(s)),
             _ => write!(f, ""),
         }
     }

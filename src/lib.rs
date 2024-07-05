@@ -2,6 +2,7 @@ use pyo3::prelude::*;
 
 mod abi_utils;
 mod audio;
+mod circle;
 mod dict;
 mod error;
 mod headline;
