@@ -23,10 +23,17 @@ fn look_up(path: String, vocab: String) -> Vec<Unpacked> {
     _look_up(&path, &vocab)
 }
 
+#[pyfunction]
+fn get_sound(path: String, file_name: String) -> Vec<u8> {
+    let mut dict = MonokakidoDict::open_with_path(&path).unwrap();
+    dict.audio.get(&file_name).unwrap().to_vec()
+}
+
 /// A Python module implemented in Rust.
 #[pymodule]
 fn accent_dict(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(look_up, m)?)?;
+    m.add_function(wrap_pyfunction!(get_sound, m)?)?;
     Ok(())
 }
 
@@ -51,17 +58,27 @@ struct Unpacked {
     head: String,
     #[pyo3(get)]
     kanji: Option<String>,
+    // accent string, audio id
     #[pyo3(get)]
-    accent: Vec<String>,
+    pron: Vec<Pron>,
+}
+#[pyclass]
+#[derive(Debug, Clone)]
+struct Pron {
+    #[pyo3(get)]
+    accent: String,
+    #[pyo3(get)]
+    sound_file: String,
 }
 
 fn unpack_dic_item(dic_item: DicItem) -> Vec<Unpacked> {
     let mut unpacked = Vec::new();
 
     for head_g in dic_item.1 {
-        let mut accent = Vec::new();
+        let mut pron = Vec::new();
         let mut head = String::new();
         let mut kanji = None;
+
         // head, kanji
         match head_g.0 {
             Head::H(h) => {
@@ -83,15 +100,31 @@ fn unpack_dic_item(dic_item: DicItem) -> Vec<Unpacked> {
         // accent
         for body_content in head_g.1 .0 {
             match body_content {
-                BodyContent::Accent(a) => {
-                    accent.append(&mut a.iter().map(|a| format!("{a}")).collect())
-                }
+                BodyContent::Accent(a) => pron.append(
+                    &mut a
+                        .iter()
+                        .filter_map(|a| {
+                            get_sound_id(a).map(|s_id| Pron {
+                                accent: format!("{a}"),
+                                sound_file: s_id,
+                            })
+                        })
+                        .collect(),
+                ),
                 BodyContent::ConTable(c) => {
                     for c_conent in c {
                         match c_conent {
-                            ConTableContent::Accent(a) => {
-                                accent.append(&mut a.iter().map(|a| format!("{a}")).collect())
-                            }
+                            ConTableContent::Accent(a) => pron.append(
+                                &mut a
+                                    .iter()
+                                    .filter_map(|a| {
+                                        get_sound_id(a).map(|s_id| Pron {
+                                            accent: format!("{a}"),
+                                            sound_file: s_id,
+                                        })
+                                    })
+                                    .collect(),
+                            ),
                             _ => {}
                         }
                     }
@@ -101,12 +134,18 @@ fn unpack_dic_item(dic_item: DicItem) -> Vec<Unpacked> {
         }
 
         if !head.is_empty() {
-            unpacked.push(Unpacked {
-                head,
-                kanji,
-                accent,
-            })
+            unpacked.push(Unpacked { head, kanji, pron })
         }
     }
     unpacked
+}
+
+fn get_sound_id(accent: &Accent) -> Option<String> {
+    for at in accent.1.iter() {
+        match at {
+            AccentText::Sound(s) => return Some(s.clone()),
+            _ => {}
+        }
+    }
+    None
 }
