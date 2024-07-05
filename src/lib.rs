@@ -25,6 +25,7 @@ fn look_up(path: String, vocab: String) -> Vec<Unpacked> {
 
 #[pyfunction]
 fn get_sound(path: String, file_name: String) -> Vec<u8> {
+    let file_name = file_name.strip_suffix(".aac").unwrap_or(&file_name);
     let mut dict = MonokakidoDict::open_with_path(&path).unwrap();
     dict.audio.get(&file_name).unwrap().to_vec()
 }
@@ -39,7 +40,16 @@ fn accent_dict(m: &Bound<'_, PyModule>) -> PyResult<()> {
 
 fn _look_up(path: &str, vocab: &str) -> Vec<Unpacked> {
     let mut dict = MonokakidoDict::open_with_path(path).unwrap();
-    let (_, items) = dict.keys.search_exact(vocab).unwrap();
+    let items = match dict.keys.search_exact(vocab) {
+        Ok((_, items)) => items,
+        Err(e) => {
+            return vec![Unpacked {
+                id: "0".to_string(),
+                head: "<not found>".to_string(),
+                ..Default::default()
+            }]
+        }
+    };
 
     let mut unpacked = Vec::new();
     for id in items {
@@ -52,6 +62,7 @@ fn _look_up(path: &str, vocab: &str) -> Vec<Unpacked> {
     unpacked
 }
 
+#[derive(Debug, Default)]
 #[pyclass]
 struct Unpacked {
     #[pyo3(get)]
@@ -65,7 +76,7 @@ struct Unpacked {
     pron: Vec<Pron>,
 }
 #[pyclass]
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 struct Pron {
     #[pyo3(get)]
     accent: String,
