@@ -51,16 +51,21 @@ struct Unpacked {
     head: String,
     #[pyo3(get)]
     kanji: Option<String>,
+    #[pyo3(get)]
+    accent: Vec<String>,
 }
 
 fn unpack_dic_item(dic_item: DicItem) -> Vec<Unpacked> {
     let mut unpacked = Vec::new();
 
     for head_g in dic_item.1 {
+        let mut accent = Vec::new();
+        let mut head = String::new();
+        let mut kanji = None;
+        // head, kanji
         match head_g.0 {
             Head::H(h) => {
-                let head = h.iter().map(|h| format!("{h} ")).collect();
-                let mut kanji = None;
+                head = h.iter().map(|h| format!("{h} ")).collect();
                 for i in h {
                     if let H::HW(s, i) = i {
                         let mut s = s.chars();
@@ -71,9 +76,36 @@ fn unpack_dic_item(dic_item: DicItem) -> Vec<Unpacked> {
                         }
                     }
                 }
-                unpacked.push(Unpacked { head, kanji })
             }
             _ => {}
+        }
+
+        // accent
+        for body_content in head_g.1 .0 {
+            match body_content {
+                BodyContent::Accent(a) => {
+                    accent.append(&mut a.iter().map(|a| format!("{a}")).collect())
+                }
+                BodyContent::ConTable(c) => {
+                    for c_conent in c {
+                        match c_conent {
+                            ConTableContent::Accent(a) => {
+                                accent.append(&mut a.iter().map(|a| format!("{a}")).collect())
+                            }
+                            _ => {}
+                        }
+                    }
+                }
+                _ => {}
+            }
+        }
+
+        if !head.is_empty() {
+            unpacked.push(Unpacked {
+                head,
+                kanji,
+                accent,
+            })
         }
     }
     unpacked
