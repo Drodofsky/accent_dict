@@ -1,4 +1,7 @@
-use svg::{node::element::Text, Document};
+use svg::{
+    node::element::{path::Data, Circle, Path, Text},
+    Document,
+};
 
 const CIRCLE: char = '\u{20dd}';
 const VOICED: char = '\u{309a}';
@@ -6,24 +9,17 @@ const VOICED: char = '\u{309a}';
 pub fn gen_svg(accent_word: &str) -> String {
     let mut doc = Document::new();
     let mora = str_to_mora(accent_word);
-    let voiced_count = mora
-        .iter()
-        .map(|c| c.chars())
-        .flatten()
-        .filter(|c| c == &VOICED)
-        .count();
-
     let mora_len = if mora.contains(&"＼".to_string()) {
         mora.len() - 1
     } else {
         mora.len()
-    }
-    .saturating_sub(voiced_count);
+    };
     let svg_width = (mora_len.saturating_sub(1) * 35) + 32;
     doc = doc.set("width", svg_width);
     doc = doc.set("height", 75);
     doc = doc.set("viewBox", (0, 0, svg_width, 75));
 
+    // draw text
     for (pos, m) in mora
         .iter()
         .filter(|m| m.as_str() != "＼" && m.as_str() != "\u{20dd}" && m.as_str() != "▔")
@@ -33,8 +29,49 @@ pub fn gen_svg(accent_word: &str) -> String {
         println!("draw");
         doc = draw_mora(doc, m, x.saturating_sub(11))
     }
+
+    // draw accent pattern
+    // heiban
+    if mora.last().unwrap() == "▔" {
+        doc = draw_path(doc, 16, 30, PathType::Up, 35);
+        doc = draw_circle(doc, 16, 30, false);
+
+        for (i, m) in mora.iter().enumerate().skip(1) {
+            let x = 16 + (i * 35);
+            if m == "▔" {
+                doc = draw_circle(doc, x, 5, true)
+            } else {
+                doc = draw_path(doc, x, 5, PathType::Straight, 35);
+                doc = draw_circle(doc, x, 5, false)
+            }
+        }
+    }
+
     println!("{}", doc.to_string());
     doc.to_string()
+}
+
+#[derive(Debug, PartialEq, Clone, Copy)]
+enum PathType {
+    Straight = 0,
+    Up = -25,
+    Down = 25,
+}
+
+fn draw_path(
+    document: Document,
+    xpos: usize,
+    ypos: usize,
+    typ: PathType,
+    width: usize,
+) -> Document {
+    let data = Data::new()
+        .move_to((xpos, ypos))
+        .line_by((width, typ as isize));
+    let path = Path::new()
+        .set("d", data)
+        .set("style", "fill:none;stroke:#fff;stroke-width:1.5;");
+    document.add(path)
 }
 
 pub fn draw_mora(mut doc: Document, mora: &str, xpos: usize) -> Document {
@@ -68,6 +105,26 @@ pub fn draw_mora(mut doc: Document, mora: &str, xpos: usize) -> Document {
         .set("style", "font-size:20px;font-family:sans-serif;fill:#fff;");
 
     doc.add(t)
+}
+
+fn draw_circle(mut doc: Document, xpos: usize, ypos: usize, heiban: bool) -> Document {
+    let c = Circle::new()
+        .set("r", 5)
+        .set("cx", xpos)
+        .set("cy", ypos)
+        .set("style", "opacity:1;fill:#fff;");
+    doc = doc.add(c);
+
+    if heiban {
+        let c = Circle::new()
+            .set("r", 3.25)
+            .set("cx", xpos)
+            .set("cy", ypos)
+            .set("style", "opacity:1;fill:#000;");
+        return doc.add(c);
+    }
+
+    doc
 }
 
 fn str_to_mora(word: &str) -> Vec<String> {
