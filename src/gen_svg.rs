@@ -9,11 +9,7 @@ const VOICED: char = '\u{309a}';
 pub fn gen_svg(accent_word: &str) -> String {
     let mut doc = Document::new();
     let mora = str_to_mora(accent_word);
-    let mora_len = if mora.contains(&"＼".to_string()) {
-        mora.len() - 1
-    } else {
-        mora.len()
-    };
+    let mora_len = mora.len();
     let svg_width = (mora_len.saturating_sub(1) * 35) + 32;
     doc = doc.set("width", svg_width);
     doc = doc.set("height", 75);
@@ -51,14 +47,19 @@ pub fn gen_svg(accent_word: &str) -> String {
         doc = draw_path(doc, 16, 5, PathType::Down, 35);
         doc = draw_circle(doc, 16, 5, false);
         let mut last_i = 0;
-        for (i, _m) in mora.iter().skip(2).enumerate().skip(1) {
+        for (i, _m) in mora
+            .iter()
+            .filter(|s| s.as_str() != "＼")
+            .enumerate()
+            .skip(1)
+        {
             let x: usize = 16 + (i * 35);
             last_i = i;
             doc = draw_path(doc, x, 30, PathType::Straight, 35);
             doc = draw_circle(doc, x, 30, false)
         }
         let x: usize = 16 + ((last_i + 1) * 35);
-        doc = draw_circle(doc, x, 30, false)
+        doc = draw_circle(doc, x, 30, true)
     }
     /* o daka */
     else if mora.last().unwrap() == "＼" {
@@ -72,7 +73,11 @@ pub fn gen_svg(accent_word: &str) -> String {
             doc = draw_circle(doc, x, 5, false)
         }
         let x: usize = 16 + ((last_i + 1) * 35);
-        doc = draw_circle(doc, x, 5, false)
+        doc = draw_circle(doc, x, 5, false);
+
+        doc = draw_path(doc, x, 5, PathType::Down, 35);
+        let x: usize = 16 + ((last_i + 2) * 35);
+        doc = draw_circle(doc, x, 30, true)
     }
     /* naka daka */
     else {
@@ -109,7 +114,11 @@ pub fn gen_svg(accent_word: &str) -> String {
             doc = draw_circle(doc, x, 30, false)
         }
         let x: usize = 16 + ((last_i + last_i2 + 1) * 35);
-        doc = draw_circle(doc, x, 30, false)
+        doc = draw_circle(doc, x, 30, false);
+
+        doc = draw_path(doc, x, 30, PathType::Straight, 35);
+        let x: usize = 16 + ((last_i + last_i2 + 2) * 35);
+        doc = draw_circle(doc, x, 30, true)
     }
 
     println!("{}", doc.to_string());
@@ -172,7 +181,7 @@ pub fn draw_mora(mut doc: Document, mora: &str, xpos: usize) -> Document {
     doc.add(t)
 }
 
-fn draw_circle(mut doc: Document, xpos: usize, ypos: usize, heiban: bool) -> Document {
+fn draw_circle(mut doc: Document, xpos: usize, ypos: usize, is_next: bool) -> Document {
     let c = Circle::new()
         .set("r", 5)
         .set("cx", xpos)
@@ -180,7 +189,7 @@ fn draw_circle(mut doc: Document, xpos: usize, ypos: usize, heiban: bool) -> Doc
         .set("style", "opacity:1;fill:#fff;");
     doc = doc.add(c);
 
-    if heiban {
+    if is_next {
         let c = Circle::new()
             .set("r", 3.25)
             .set("cx", xpos)

@@ -84,7 +84,7 @@ struct Unpacked {
     pron: Vec<Pron>,
 }
 #[pyclass]
-#[derive(Debug, Clone, Default,PartialEq)]
+#[derive(Debug, Clone, Default, PartialEq)]
 struct Pron {
     #[pyo3(get)]
     accent: String,
@@ -155,7 +155,7 @@ fn unpack_dic_item(dic_item: DicItem) -> Vec<Unpacked> {
         }
 
         // fixes duplicated pron in verbs
-        if let Some(a) = pron.get(0){
+        if let Some(a) = pron.get(0) {
             if let Some(b) = pron.get(1) {
                 if a == b {
                     pron.remove(0);
