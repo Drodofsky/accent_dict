@@ -84,10 +84,9 @@ class Dictionary:
             return None
         mw.col.media.write_data(sanitise_str(pitch) + ".svg", str.encode(pitch_svg))
 
-    def write_voc(self, id: str, sound_file: str, pitch: str, kanji: Optional[str]) -> None:
+    def write_voc(self, id: str, sound_file: str, pitch: str, voc: str) -> None:
         self.update_field("dict", id)
-        if kanji is not None:
-            self.update_field("kanji", kanji)
+        self.update_field("voc", voc)
         self.update_field("audio", "[sound:" + sound_file + "]")
         self.update_field("pitch", '<img src="' + sanitise_str(pitch) + '.svg">')
         self.save_audio(sound_file)
@@ -104,7 +103,7 @@ class Dictionary:
                 pron_action.setFont(self.font)
                 pron_action.triggered.connect(
                     lambda _, id=vocab.id, sound_file=pron.sound_file, pitch=pron.accent,
-                           kanji=vocab.kanji: self.write_voc(id, sound_file, pitch, kanji))
+                           voc=vocab.head: self.write_voc(id, sound_file, pitch, voc))
                 vocab_menu.addAction(pron_action)
 
             self.dict_menu.addMenu(vocab_menu)
@@ -121,3 +120,4 @@ def on_text_update(note: Note) -> None:
 
 gui_hooks.editor_did_init.append(create_dict)
 gui_hooks.editor_did_fire_typing_timer.append(on_text_update)
+
