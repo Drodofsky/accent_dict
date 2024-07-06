@@ -155,7 +155,7 @@ pub fn draw_mora(mut doc: Document, mora: &str, xpos: usize) -> Document {
         .count();
     let text = if mora_len == 1 {
         Text::new(mora)
-            .set("x", xpos.saturating_add(5))
+            .set("x", xpos)
             .set("y", 67.5)
             .set("style", "font-size:20px;font-family:sans-serif;fill:#fff;")
     } else {
