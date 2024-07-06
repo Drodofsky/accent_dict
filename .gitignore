@@ -7,3 +7,4 @@ Cargo.lock
 .github/
 *.so
 /build_env
+.idea/
