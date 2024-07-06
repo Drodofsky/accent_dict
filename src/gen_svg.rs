@@ -46,6 +46,22 @@ pub fn gen_svg(accent_word: &str) -> String {
             }
         }
     }
+    /* o daka */
+    else if mora.last().unwrap() == "＼" {
+        doc = draw_path(doc, 16, 30, PathType::Up, 35);
+        doc = draw_circle(doc, 16, 30, false);
+        let mut last_i = 0;
+        for (i, _m) in mora.iter().skip(2).enumerate().skip(1) {
+            let x: usize = 16 + (i * 35);
+            last_i = i;
+            doc = draw_path(doc, x, 5, PathType::Straight, 35);
+            doc = draw_circle(doc, x, 5, false)
+        }
+        let x: usize = 16 + ((last_i + 1) * 35);
+        doc = draw_circle(doc, x, 5, false)
+    }
+    // atama daka
+    // naka daka
 
     println!("{}", doc.to_string());
     doc.to_string()
