@@ -8,3 +8,7 @@ It is ABSOLUTELY NOT inteded to support piracy;
 I strongly condemn making unauthorized copies of Monokakido's dictionaries,
 and take no part or responsibility in that kind of activity.
 Please buy your own dictionaries directly from Monokakido to show your love and support.
+
+------
+
+![Anki](media/anki.gif)
