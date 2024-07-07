@@ -5,6 +5,8 @@ use svg::{
 
 const CIRCLE: char = '\u{20dd}';
 const VOICED: char = '\u{309a}';
+const HALF_WIDTH_DAKUTEN: char = 'ﾞ';
+const HALF_WIDTH_HANDAKUTEN: char = 'ﾟ';
 
 pub fn gen_svg(accent_word: &str) -> String {
     let mut doc = Document::new();
@@ -151,7 +153,9 @@ fn draw_path(
 pub fn draw_mora(mut doc: Document, mora: &str, xpos: usize) -> Document {
     let mora_len = mora
         .chars()
-        .filter(|c| c != &CIRCLE && c != &VOICED)
+        .filter(|c| {
+            c != &CIRCLE && c != &VOICED && c != &HALF_WIDTH_DAKUTEN && c != &HALF_WIDTH_HANDAKUTEN
+        })
         .count();
     let text = if mora_len == 1 {
         Text::new(mora)
@@ -212,6 +216,12 @@ fn str_to_mora(word: &str) -> Vec<String> {
             let l = mora.len().saturating_sub(1);
             mora[l].push(c)
         } else if c == VOICED {
+            let l = mora.len().saturating_sub(1);
+            mora[l].push(c)
+        } else if c == HALF_WIDTH_DAKUTEN {
+            let l = mora.len().saturating_sub(1);
+            mora[l].push(c)
+        } else if c == HALF_WIDTH_HANDAKUTEN {
             let l = mora.len().saturating_sub(1);
             mora[l].push(c)
         } else {

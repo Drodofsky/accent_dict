@@ -46,6 +46,108 @@ pub fn to_circle(input: &str) -> String {
             'レ' => circled.push('㋹'),
             'ロ' => circled.push('㋺'),
             'ワ' => circled.push('㋻'),
+
+            'ガ' => {
+                circled.push('㋕');
+                circled.push('ﾞ');
+            }
+            'ギ' => {
+                circled.push('㋖');
+                circled.push('ﾞ');
+            }
+            'グ' => {
+                circled.push('㋗');
+                circled.push('ﾞ');
+            }
+            'ゲ' => {
+                circled.push('㋘');
+                circled.push('ﾞ');
+            }
+            'ゴ' => {
+                circled.push('㋙');
+                circled.push('ﾞ');
+            }
+            'ザ' => {
+                circled.push('㋚');
+                circled.push('ﾞ');
+            }
+            'ジ' => {
+                circled.push('㋛');
+                circled.push('ﾞ');
+            }
+            'ズ' => {
+                circled.push('㋜');
+                circled.push('ﾞ');
+            }
+            'ゼ' => {
+                circled.push('㋝');
+                circled.push('ﾞ');
+            }
+            'ゾ' => {
+                circled.push('㋞');
+                circled.push('ﾞ');
+            }
+            'ダ' => {
+                circled.push('㋟');
+                circled.push('ﾞ');
+            }
+            'ヂ' => {
+                circled.push('㋠');
+                circled.push('ﾞ');
+            }
+            'ヅ' => {
+                circled.push('㋡');
+                circled.push('ﾞ');
+            }
+            'デ' => {
+                circled.push('㋢');
+                circled.push('ﾞ');
+            }
+            'ド' => {
+                circled.push('㋣');
+                circled.push('ﾞ');
+            }
+            'バ' => {
+                circled.push('㋩');
+                circled.push('ﾞ');
+            }
+            'ビ' => {
+                circled.push('㋪');
+                circled.push('ﾞ');
+            }
+            'ブ' => {
+                circled.push('㋫');
+                circled.push('ﾞ');
+            }
+            'ベ' => {
+                circled.push('㋬');
+                circled.push('ﾞ');
+            }
+            'ボ' => {
+                circled.push('㋭');
+                circled.push('ﾞ');
+            }
+            'パ' => {
+                circled.push('㋩');
+                circled.push('ﾟ');
+            }
+            'ピ' => {
+                circled.push('㋪');
+                circled.push('ﾟ');
+            }
+            'プ' => {
+                circled.push('㋫');
+                circled.push('ﾟ');
+            }
+            'ペ' => {
+                circled.push('㋬');
+                circled.push('ﾟ');
+            }
+            'ポ' => {
+                circled.push('㋭');
+                circled.push('ﾟ');
+            }
+
             _ => {
                 circled.push(c);
                 circled.push('\u{20DD}');
@@ -65,5 +167,9 @@ mod tests {
     #[test]
     fn hiragana() {
         assert_eq!(to_circle("あいおきのそるわ"), "あ⃝い⃝お⃝き⃝の⃝そ⃝る⃝わ⃝")
+    }
+    #[test]
+    fn pi() {
+        assert_eq!(to_circle("ピピ"), "㋪ﾟ㋪ﾟ")
     }
 }
