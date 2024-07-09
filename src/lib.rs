@@ -1,3 +1,5 @@
+use std::any::Any;
+
 use pyo3::prelude::*;
 
 mod abi_utils;
@@ -48,23 +50,42 @@ fn accent_dict(m: &Bound<'_, PyModule>) -> PyResult<()> {
 
 fn _look_up(path: &str, vocab: &str) -> Vec<Unpacked> {
     let mut dict = MonokakidoDict::open_with_path(path).unwrap();
-    let items = match dict.keys.search_exact(vocab) {
-        Ok((_, items)) => items,
-        Err(e) => {
-            return vec![Unpacked {
-                id: "0".to_string(),
-                head: "<not found>".to_string(),
-                ..Default::default()
-            }]
-        }
-    };
+    let mut unpacked: Vec<Unpacked> = Vec::new();
 
-    let mut unpacked = Vec::new();
-    for id in items {
-        let page = dict.pages.get_page(id).unwrap();
+    // is dict index
+    if vocab.starts_with(|c: char| c.is_ascii_digit()) {
+        let index: usize = vocab
+            .chars()
+            .take_while(|c: &char| c.is_ascii_digit())
+            .collect::<String>()
+            .parse()
+            .unwrap();
+        //I don't know why it is off by one
+        let index = index.saturating_sub(1);
+        let (_, page) = dict.pages.page_by_idx(index).unwrap();
         let parsed = parse_xml(page);
         println!("{parsed:#?}");
         unpacked.append(&mut unpack_dic_item(parsed))
+
+    // is vocab
+    } else {
+        let items = match dict.keys.search_exact(vocab) {
+            Ok((_, items)) => items,
+            Err(e) => {
+                return vec![Unpacked {
+                    id: "0".to_string(),
+                    head: "<not found>".to_string(),
+                    ..Default::default()
+                }]
+            }
+        };
+
+        for id in items {
+            let page = dict.pages.get_page(id).unwrap();
+            let parsed = parse_xml(page);
+            println!("{parsed:#?}");
+            unpacked.append(&mut unpack_dic_item(parsed))
+        }
     }
 
     unpacked
