@@ -108,9 +108,11 @@ struct Unpacked {
 #[derive(Debug, Clone, Default, PartialEq)]
 struct Pron {
     #[pyo3(get)]
+    id: String,
+    #[pyo3(get)]
     accent: String,
     #[pyo3(get)]
-    sound_file: String,
+    sound_file: Option<String>,
 }
 
 fn unpack_dic_item(dic_item: DicItem) -> Vec<Unpacked> {
@@ -138,6 +140,7 @@ fn unpack_dic_item(dic_item: DicItem) -> Vec<Unpacked> {
             }
             _ => {}
         }
+        let mut pron_id = 0;
 
         // accent
         for body_content in head_g.1 .0 {
@@ -146,9 +149,14 @@ fn unpack_dic_item(dic_item: DicItem) -> Vec<Unpacked> {
                     &mut a
                         .iter()
                         .filter_map(|a| {
-                            get_sound_id(a).map(|s_id| Pron {
-                                accent: format!("{a}"),
-                                sound_file: s_id,
+                            get_sound_id(a).map(|s_id| {
+                                let p = Pron {
+                                    id: format!("{pron_id}"),
+                                    accent: format!("{a}"),
+                                    sound_file: Some(s_id),
+                                };
+                                pron_id += 1;
+                                p
                             })
                         })
                         .collect(),
@@ -160,9 +168,14 @@ fn unpack_dic_item(dic_item: DicItem) -> Vec<Unpacked> {
                                 &mut a
                                     .iter()
                                     .filter_map(|a| {
-                                        get_sound_id(a).map(|s_id| Pron {
-                                            accent: format!("{a}"),
-                                            sound_file: s_id,
+                                        get_sound_id(a).map(|s_id| {
+                                            let p = Pron {
+                                                id: format!("{pron_id}"),
+                                                accent: format!("{a}"),
+                                                sound_file: Some(s_id),
+                                            };
+                                            pron_id += 1;
+                                            p
                                         })
                                     })
                                     .collect(),
@@ -170,6 +183,20 @@ fn unpack_dic_item(dic_item: DicItem) -> Vec<Unpacked> {
                             _ => {}
                         }
                     }
+                }
+                BodyContent::AccentRound(RoundBrackets(a), sound) => {
+                    let a = Accent(None, a);
+                    let mut sound_file = get_sound_id(&a);
+                    if let Some(s) = sound {
+                        sound_file = Some(s.0);
+                    }
+                    let p = Pron {
+                        id: format!("{pron_id}"),
+                        accent: format!("{a}"),
+                        sound_file: sound_file,
+                    };
+                    pron_id += 1;
+                    pron.push(p)
                 }
                 _ => {}
             }
