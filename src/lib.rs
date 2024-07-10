@@ -1,4 +1,4 @@
-use std::any::Any;
+use std::{any::Any, default};
 
 use pyo3::prelude::*;
 
@@ -69,18 +69,26 @@ fn _look_up(path: &str, vocab: &str) -> Vec<Unpacked> {
 
     // is vocab
     } else {
-        let items = match dict.keys.search_exact(vocab) {
-            Ok((_, items)) => items,
-            Err(e) => {
-                return vec![Unpacked {
-                    id: "0".to_string(),
-                    head: "<not found>".to_string(),
-                    ..Default::default()
-                }]
-            }
-        };
+        let mut pages = Vec::new();
 
-        for id in items {
+        if let Ok((_, hw_pages)) = dict.headword_keys.search_exact(vocab) {
+            pages.push(hw_pages);
+        }
+        if let Ok((_, compound_pages)) = dict.compound_keys.search_exact(vocab) {
+            pages.push(compound_pages);
+        }
+        if let Ok((_, numeral_pages)) = dict.numeral_keys.search_exact(vocab) {
+            pages.push(numeral_pages);
+        }
+        if pages.len() == 0 {
+            return vec![Unpacked {
+                id: "0".to_string(),
+                head: "<not found>".to_string(),
+                ..Default::default()
+            }];
+        }
+
+        for id in pages.iter().flat_map(|p| p.clone()) {
             let page = dict.pages.get_page(id).unwrap();
             let parsed = parse_xml(page);
             println!("{parsed:#?}");

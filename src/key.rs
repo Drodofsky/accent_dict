@@ -121,8 +121,8 @@ impl Keys {
         Ok(())
     }
 
-    pub fn new(path: &str) -> Result<Keys, Error> {
-        let mut file = File::open(PathBuf::from(path).join("key/").join("headword.keyindex"))?;
+    pub fn new(path: &str, key_index: &str) -> Result<Keys, Error> {
+        let mut file = File::open(PathBuf::from(path).join("key/").join(key_index))?;
         let file_size = file.metadata()?.len() as usize;
         let mut hdr = FileHeader::default();
         file.read_exact(hdr.as_bytes_mut())?;
