@@ -226,6 +226,48 @@ fn unpack_dic_item(dic_item: DicItem) -> Vec<Unpacked> {
             })
         }
     }
+    let mut numbers = unpack_numbers(&dic_item.2);
+    unpacked.append(&mut numbers);
+    unpacked
+}
+
+fn unpack_numbers(numbers: &[Josushi]) -> Vec<Unpacked> {
+    let mut unpacked = Vec::new();
+    for josushi in numbers {
+        let id = &josushi.0 .0 .0;
+        let head = &josushi.0 .1;
+        let mut accent_id = 0;
+        let mut prons = Vec::new();
+        for accent in josushi.1.iter() {
+            let sound = get_sound_id(accent);
+            let pron = Pron {
+                id: format!("{accent_id}"),
+                accent: format!("{accent}"),
+                sound_file: sound,
+            };
+            prons.push(pron);
+            accent_id += 1;
+        }
+        for ident in josushi.2.iter() {
+            let accent = Accent(None, ident.0.clone());
+            let sound = get_sound_id(&accent);
+            let pron = Pron {
+                id: format!("{accent_id}"),
+                accent: format!("{accent}"),
+                sound_file: sound,
+            };
+            prons.push(pron);
+            accent_id += 1;
+        }
+        let unpa = Unpacked {
+            id: id.clone(),
+            head: head.clone(),
+            kanji: None,
+            pron: prons,
+        };
+        unpacked.push(unpa);
+    }
+
     unpacked
 }
 
