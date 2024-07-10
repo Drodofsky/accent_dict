@@ -156,16 +156,15 @@ fn unpack_dic_item(dic_item: DicItem) -> Vec<Unpacked> {
                 BodyContent::Accent(a) => pron.append(
                     &mut a
                         .iter()
-                        .filter_map(|a| {
-                            get_sound_id(a).map(|s_id| {
-                                let p = Pron {
-                                    id: format!("{pron_id}"),
-                                    accent: format!("{a}"),
-                                    sound_file: Some(s_id),
-                                };
-                                pron_id += 1;
-                                p
-                            })
+                        .map(|a| {
+                            let s_id = get_sound_id(a);
+                            let p = Pron {
+                                id: format!("{pron_id}"),
+                                accent: format!("{a}"),
+                                sound_file: s_id,
+                            };
+                            pron_id += 1;
+                            p
                         })
                         .collect(),
                 ),
@@ -175,16 +174,15 @@ fn unpack_dic_item(dic_item: DicItem) -> Vec<Unpacked> {
                             ConTableContent::Accent(a) => pron.append(
                                 &mut a
                                     .iter()
-                                    .filter_map(|a| {
-                                        get_sound_id(a).map(|s_id| {
-                                            let p = Pron {
-                                                id: format!("{pron_id}"),
-                                                accent: format!("{a}"),
-                                                sound_file: Some(s_id),
-                                            };
-                                            pron_id += 1;
-                                            p
-                                        })
+                                    .map(|a| {
+                                        let s_id = get_sound_id(a);
+                                        let p = Pron {
+                                            id: format!("{pron_id}"),
+                                            accent: format!("{a}"),
+                                            sound_file: s_id,
+                                        };
+                                        pron_id += 1;
+                                        p
                                     })
                                     .collect(),
                             ),
