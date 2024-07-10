@@ -81,7 +81,7 @@ pub enum H {
     SquareBrackets(String),
     RoundBrackets(String),
     SquareBox(String),
-    Subheadword(Name, String),
+    Subheadword(ID, String),
     BlackBranckets(String, Option<(Inner, char)>),
     DAngleBrackets(String),
     AngleBrackets(String),
@@ -120,10 +120,10 @@ impl fmt::Display for H {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct Joshiword(pub Name, pub String);
+pub struct Joshiword(pub ID, pub String);
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct Name(pub String);
+pub struct ID(pub String);
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct DAngleBrackets(pub String);
@@ -177,7 +177,7 @@ impl fmt::Display for Accent {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum AccentText {
     Text(String),
     SymbolMacron(String),
@@ -204,7 +204,7 @@ impl fmt::Display for AccentText {
 pub struct RoundBrackets(pub Vec<AccentText>);
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct ExampleHead(pub Name, pub String);
+pub struct ExampleHead(pub ID, pub String);
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Example(pub ExampleHead, pub Vec<ExampleContent>);
@@ -224,7 +224,7 @@ pub struct Josushi(
     pub Option<Notes>,
 );
 #[derive(Debug, Serialize, Deserialize)]
-pub struct JosushiNumber(pub Name, pub String);
+pub struct JosushiNumber(pub ID, pub String);
 
 #[derive(Debug, Serialize, Deserialize)]
 

@@ -106,10 +106,10 @@ fn parse_subheadword(input: &str) -> IResult<&str, H> {
         .verify_class("subheadword ")
 }
 
-fn parse_named_word(input: &str) -> IResult<&str, (Name, String)> {
+fn parse_named_word(input: &str) -> IResult<&str, (ID, String)> {
     xml_tag("a", text)(input)
         .map(|(rem, (attrs, x))| {
-            let name = Name(attrs.attr("name").unwrap().into());
+            let name = ID(attrs.attr("name").unwrap().into());
             (rem, (attrs, (name, x.into())))
         })
         .verify_class("anchor")
