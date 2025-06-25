@@ -262,6 +262,8 @@ pub struct Ruby(pub Rb, pub Rt);
 
 impl fmt::Display for Ruby {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        // unicode furigana is not supported
+        // write!(f, "\u{FFF9}{}\u{FFFA}{}\u{FFFB}", self.0,self.1)
         write!(f, "{}", self.0)
     }
 }
