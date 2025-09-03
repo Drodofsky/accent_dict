@@ -44,7 +44,7 @@ fn parse_body(input: &str) -> IResult<&str, DicItem> {
 }
 
 fn parse_dic_item(input: &str) -> IResult<&str, DicItem> {
-    xml_tag("span", ((many1(parse_head_g), many0(parse_josuhi))))(input).and_then(
+    xml_tag("span", (many1(parse_head_g), many0(parse_josuhi)))(input).and_then(
         |(rem, (attr, (i, j)))| {
             if attr.attr("class") == Some("dic-item") {
                 let id = Id(attr.attr("id").unwrap().parse().unwrap());
@@ -141,36 +141,36 @@ fn parse_headword(input: &str) -> IResult<&str, &str> {
 fn parse_hw(input: &str) -> IResult<&str, (&str, Option<(Vec<Inner>, char)>)> {
     xml_tag(
         "span",
-        ((
+        (
             text,
-            opt(((
+            opt((
                 many1(alt((
                     parse_d_angle_brackets.map(|s| Inner::DAngleBrackets(DAngleBrackets(s.into()))),
-                    many1(((parse_ruby, opt(kana.map(|s| s.to_string()))))).map(|r| Inner::Ruby(r)),
+                    many1((parse_ruby, opt(kana.map(|s| s.to_string())))).map(|r| Inner::Ruby(r)),
                     parse_round_brackets.map(|r| Inner::RoundBrackets(r.into())),
                     h_text.map(|s| Inner::Text(s.into())),
                     parse_span.map(|s| Inner::Span(s.into())),
                 ))),
                 char('】'),
-            ))),
-        )),
+            )),
+        ),
     )(input)
     .verify_class("hw")
 }
 fn parse_black_branckets(input: &str) -> IResult<&str, (&str, Option<(Inner, char)>)> {
     xml_tag(
         "span",
-        ((
+        (
             text,
-            opt(((
+            opt((
                 alt((
                     parse_d_angle_brackets.map(|s| Inner::DAngleBrackets(DAngleBrackets(s.into()))),
-                    many1(((parse_ruby, opt(kana.map(|s| s.to_string()))))).map(|r| Inner::Ruby(r)),
+                    many1((parse_ruby, opt(kana.map(|s| s.to_string())))).map(|r| Inner::Ruby(r)),
                     parse_round_brackets.map(|r| Inner::RoundBrackets(r.into())),
                 )),
                 char('】'),
-            ))),
-        )),
+            )),
+        ),
     )(input)
     .verify_class("black_branckets")
 }
@@ -275,7 +275,7 @@ fn parse_accent2(input: &str) -> IResult<&str, Accent> {
 fn parse_accent_head(input: &str) -> IResult<&str, AccentHead> {
     xml_tag(
         "accent_head",
-        parse_square_box.map(|(s)| AccentHead(SquareBox(s.into()))),
+        parse_square_box.map(|s| AccentHead(SquareBox(s.into()))),
     )(input)
     .map(|(rem, (_, a))| (rem, a))
 }

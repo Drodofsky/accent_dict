@@ -42,7 +42,7 @@ fn parse_note(input: &str) -> IResult<&str, Notes> {
         "span",
         many1(preceded(
             opt(parse_br),
-            ((
+            (
                 opt(parse_note_num),
                 many1(alt((
                     text.map(|s| NoteContent::Text(s.into())),
@@ -52,7 +52,7 @@ fn parse_note(input: &str) -> IResult<&str, Notes> {
                     parse_symbol_macron.map(|s| NoteContent::SymbolMacron(s.into())),
                     parse_bodyref.map(|(i, c)| NoteContent::Ref(i, c)),
                 ))),
-            )),
+            ),
         ))
         .map(|n| Notes(n)),
     )(input)

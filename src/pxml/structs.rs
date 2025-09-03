@@ -57,7 +57,7 @@ impl fmt::Display for Inner {
             Inner::RoundBrackets(s) => write!(f, "{s}"),
             Inner::Text(s) => write!(f, "{s}"),
             Inner::Span(s) => write!(f, "{s}"),
-            Inner::Ruby((ru)) => write!(
+            Inner::Ruby(ru) => write!(
                 f,
                 "{}",
                 ru.iter()

@@ -124,7 +124,7 @@ pub fn ref_text(input: &str) -> IResult<&str, &str> {
 }
 
 pub fn empty_xml_tag<'s>(t: &'s str, input: &'s str) -> IResult<&'s str, Vec<(&'s str, &'s str)>> {
-    delimited(char('<'), ((parse_identifier, parse_attrs)), tag("/>"))
+    delimited(char('<'), (parse_identifier, parse_attrs), tag("/>"))
         .parse(input)
         .and_then(|(rem, (tag, attr))| {
             if tag != t {
@@ -139,7 +139,7 @@ pub fn empty_xml_tag<'s>(t: &'s str, input: &'s str) -> IResult<&'s str, Vec<(&'
 }
 
 fn parse_open_tag<'s>(tag: &'s str, input: &'s str) -> IResult<&'s str, Vec<(&'s str, &'s str)>> {
-    delimited(char('<'), ((parse_identifier, parse_attrs)), char('>'))
+    delimited(char('<'), (parse_identifier, parse_attrs), char('>'))
         .parse(input)
         .and_then(|(rem, (t, attr))| {
             if tag != t {
