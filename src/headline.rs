@@ -87,7 +87,7 @@ impl Headlines {
     }
 
     pub fn get(&self, id: PageItemId) -> Result<String, Error> {
-        let rec = self
+        let _rec = self
             .recs
             .binary_search_by(|rec| {
                 rec.page_id
