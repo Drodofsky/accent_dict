@@ -9,8 +9,8 @@ use std::{
 };
 
 use crate::{
-    abi_utils::{read_vec, TransmuteSafe, LE32},
     Error,
+    abi_utils::{LE32, TransmuteSafe, read_vec},
 };
 
 mod abi {

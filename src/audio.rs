@@ -1,8 +1,8 @@
 use std::{fmt::Display, ops::Range, path::PathBuf};
 
 use crate::{
-    resource::{Nrsc, Rsc},
     Error,
+    resource::{Nrsc, Rsc},
 };
 
 const RSC_NAME: &str = "audio";

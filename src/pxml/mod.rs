@@ -6,17 +6,16 @@ mod xml;
 use example::*;
 use josushi::*;
 use nom::{
+    IResult, Parser,
     branch::alt,
     bytes::complete::take_until,
     character::complete::char,
     combinator::opt,
     error::{ErrorKind, ParseError},
     multi::{many0, many1},
-    sequence::{preceded, tuple},
-    IResult, Parser,
+    sequence::preceded,
 };
 pub use ruby::*;
-use serde::{Deserialize, Serialize};
 pub use structs::*;
 pub use xml::*;
 
@@ -45,7 +44,7 @@ fn parse_body(input: &str) -> IResult<&str, DicItem> {
 }
 
 fn parse_dic_item(input: &str) -> IResult<&str, DicItem> {
-    xml_tag("span", tuple((many1(parse_head_g), many0(parse_josuhi))))(input).and_then(
+    xml_tag("span", ((many1(parse_head_g), many0(parse_josuhi))))(input).and_then(
         |(rem, (attr, (i, j)))| {
             if attr.attr("class") == Some("dic-item") {
                 let id = Id(attr.attr("id").unwrap().parse().unwrap());
@@ -64,11 +63,11 @@ fn parse_dic_item(input: &str) -> IResult<&str, DicItem> {
 fn parse_head_g(input: &str) -> IResult<&str, HeadG> {
     xml_tag(
         "span",
-        tuple((
+        ((
             alt((parse_dic_head, parse_dic_head_empty)),
             alt((parse_dic_body, parse_dic_body_empty)),
         ))
-        .map(|(h, b)| HeadG(h, b)),
+            .map(|(h, b)| HeadG(h, b)),
     )(input)
     .verify_class("head-g")
 }
@@ -142,13 +141,12 @@ fn parse_headword(input: &str) -> IResult<&str, &str> {
 fn parse_hw(input: &str) -> IResult<&str, (&str, Option<(Vec<Inner>, char)>)> {
     xml_tag(
         "span",
-        tuple((
+        ((
             text,
-            opt(tuple((
+            opt(((
                 many1(alt((
                     parse_d_angle_brackets.map(|s| Inner::DAngleBrackets(DAngleBrackets(s.into()))),
-                    many1(tuple((parse_ruby, opt(kana.map(|s| s.to_string())))))
-                        .map(|r| Inner::Ruby(r)),
+                    many1(((parse_ruby, opt(kana.map(|s| s.to_string()))))).map(|r| Inner::Ruby(r)),
                     parse_round_brackets.map(|r| Inner::RoundBrackets(r.into())),
                     h_text.map(|s| Inner::Text(s.into())),
                     parse_span.map(|s| Inner::Span(s.into())),
@@ -162,13 +160,12 @@ fn parse_hw(input: &str) -> IResult<&str, (&str, Option<(Vec<Inner>, char)>)> {
 fn parse_black_branckets(input: &str) -> IResult<&str, (&str, Option<(Inner, char)>)> {
     xml_tag(
         "span",
-        tuple((
+        ((
             text,
-            opt(tuple((
+            opt(((
                 alt((
                     parse_d_angle_brackets.map(|s| Inner::DAngleBrackets(DAngleBrackets(s.into()))),
-                    many1(tuple((parse_ruby, opt(kana.map(|s| s.to_string())))))
-                        .map(|r| Inner::Ruby(r)),
+                    many1(((parse_ruby, opt(kana.map(|s| s.to_string()))))).map(|r| Inner::Ruby(r)),
                     parse_round_brackets.map(|r| Inner::RoundBrackets(r.into())),
                 )),
                 char('】'),
@@ -310,7 +307,7 @@ fn parse_text(input: &str) -> IResult<&str, &str> {
 fn parse_accent(input: &str) -> IResult<&str, Accent> {
     xml_tag(
         "span",
-        tuple((opt(parse_accent_head), parse_accent_text)).map(|(h, a)| Accent(h, a)),
+        ((opt(parse_accent_head), parse_accent_text)).map(|(h, a)| Accent(h, a)),
     )(input)
     .verify_class("accent")
 }
@@ -351,11 +348,8 @@ fn parse_round_brackets2(input: &str) -> IResult<&str, RoundBrackets> {
 }
 
 fn parse_accent_round(input: &str) -> IResult<&str, (RoundBrackets, Option<Audio>)> {
-    xml_tag(
-        "span",
-        tuple((parse_round_brackets2, opt(parse_sound.map(Audio)))),
-    )(input)
-    .verify_class("accent accent_round")
+    xml_tag("span", (parse_round_brackets2, opt(parse_sound.map(Audio))))(input)
+        .verify_class("accent accent_round")
 }
 
 fn parse_symbol_macron(input: &str) -> IResult<&str, &str> {

@@ -1,24 +1,22 @@
+use super::*;
 use nom::{
+    IResult, Parser,
     branch::alt,
     combinator::opt,
     multi::{many0, many1},
-    sequence::{preceded, tuple},
-    IResult, Parser,
+    sequence::preceded,
 };
-use serde::{Deserialize, Serialize};
-
-use super::*;
 
 pub fn parse_josuhi(input: &str) -> IResult<&str, Josushi> {
     xml_tag(
         "div",
-        tuple((
+        ((
             alt((parse_subhead_number, parse_subheadword_josushi)),
             many1(parse_accent),
             many0(parse_indet),
             opt(parse_note),
         ))
-        .map(|(n, a, i, note)| Josushi(n, a, i, note)),
+            .map(|(n, a, i, note)| Josushi(n, a, i, note)),
     )(input)
     .verify_class("josushi")
 }
@@ -44,7 +42,7 @@ fn parse_note(input: &str) -> IResult<&str, Notes> {
         "span",
         many1(preceded(
             opt(parse_br),
-            tuple((
+            ((
                 opt(parse_note_num),
                 many1(alt((
                     text.map(|s| NoteContent::Text(s.into())),

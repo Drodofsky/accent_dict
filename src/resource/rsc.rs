@@ -8,9 +8,9 @@ use std::{
 };
 
 use crate::{
-    abi_utils::{TransmuteSafe, LE32},
-    resource::decompress,
     Error,
+    abi_utils::{LE32, TransmuteSafe},
+    resource::decompress,
 };
 
 mod abi {

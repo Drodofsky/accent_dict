@@ -8,7 +8,7 @@ pub use rsc::Rsc;
 
 use crate::Error;
 
-use miniz_oxide::inflate::{core as zlib, TINFLStatus as ZStatus};
+use miniz_oxide::inflate::{TINFLStatus as ZStatus, core as zlib};
 
 #[derive(Debug)]
 struct ResourceFile {
@@ -23,8 +23,8 @@ fn decompress(
     in_buf: &[u8],
     out_buf: &mut Vec<u8>,
 ) -> Result<usize, Error> {
-    use zlib::inflate_flags as flg;
     use ZStatus::{Done, HasMoreOutput};
+    use zlib::inflate_flags as flg;
 
     let flags = flg::TINFL_FLAG_PARSE_ZLIB_HEADER | flg::TINFL_FLAG_USING_NON_WRAPPING_OUTPUT_BUF;
     let mut n_in_total = 0;

@@ -1,10 +1,10 @@
 use nom::{
-    bytes::complete::{tag, take_until, take_while, take_while1},
-    character::complete::{char, space0},
-    error::{Error, ErrorKind, ParseError},
-    multi::many0,
-    sequence::{delimited, preceded, terminated, tuple},
     IResult, Parser,
+    bytes::complete::{tag, take_while, take_while1},
+    character::complete::{char, space0},
+    error::{ErrorKind, ParseError},
+    multi::many0,
+    sequence::{delimited, preceded, terminated},
 };
 
 /*pub fn html_tag<'s,T:ToStr,O,F,E>(mut inner:F)-> impl FnMut(&'s str) -> IResult<&'s  str,(Vec<(&'s str,&'s str)>,O)> where F:Parser<&'s str,O,E>, E: ParseError<&'s str> {
@@ -19,7 +19,8 @@ pub fn xml_tag<'s, O, F, E>(
     mut inner: F,
 ) -> impl FnMut(&'s str) -> IResult<&'s str, (Vec<(&'s str, &'s str)>, O)>
 where
-    F: Parser<&'s str, O, E>,
+    //F: Parser<&'s str, O, E>,
+    F: Parser<&'s str, Error = E, Output = O>,
     E: ParseError<&'s str>,
     nom::Err<nom::error::Error<&'s str>>: From<nom::Err<E>>,
 {
@@ -123,8 +124,9 @@ pub fn ref_text(input: &str) -> IResult<&str, &str> {
 }
 
 pub fn empty_xml_tag<'s>(t: &'s str, input: &'s str) -> IResult<&'s str, Vec<(&'s str, &'s str)>> {
-    delimited(char('<'), tuple((parse_identifier, parse_attrs)), tag("/>"))(input).and_then(
-        |(rem, (tag, attr))| {
+    delimited(char('<'), ((parse_identifier, parse_attrs)), tag("/>"))
+        .parse(input)
+        .and_then(|(rem, (tag, attr))| {
             if tag != t {
                 Err(nom::Err::Error(ParseError::from_error_kind(
                     input,
@@ -133,13 +135,13 @@ pub fn empty_xml_tag<'s>(t: &'s str, input: &'s str) -> IResult<&'s str, Vec<(&'
             } else {
                 Ok((rem, attr))
             }
-        },
-    )
+        })
 }
 
 fn parse_open_tag<'s>(tag: &'s str, input: &'s str) -> IResult<&'s str, Vec<(&'s str, &'s str)>> {
-    delimited(char('<'), tuple((parse_identifier, parse_attrs)), char('>'))(input).and_then(
-        |(rem, (t, attr))| {
+    delimited(char('<'), ((parse_identifier, parse_attrs)), char('>'))
+        .parse(input)
+        .and_then(|(rem, (t, attr))| {
             if tag != t {
                 Err(nom::Err::Error(ParseError::from_error_kind(
                     input,
@@ -148,33 +150,34 @@ fn parse_open_tag<'s>(tag: &'s str, input: &'s str) -> IResult<&'s str, Vec<(&'s
             } else {
                 Ok((rem, attr))
             }
-        },
-    )
+        })
 }
 
 fn parse_close_tag<'s>(t: &'s str, input: &'s str) -> IResult<&'s str, &'s str> {
-    delimited(tag("</"), parse_identifier, char('>'))(input).and_then(|(rem, parsed)| {
-        if parsed != t {
-            Err(nom::Err::Error(ParseError::from_error_kind(
-                input,
-                ErrorKind::Satisfy,
-            )))
-        } else {
-            Ok((rem, parsed))
-        }
-    })
+    delimited(tag("</"), parse_identifier, char('>'))
+        .parse(input)
+        .and_then(|(rem, parsed)| {
+            if parsed != t {
+                Err(nom::Err::Error(ParseError::from_error_kind(
+                    input,
+                    ErrorKind::Satisfy,
+                )))
+            } else {
+                Ok((rem, parsed))
+            }
+        })
 }
 
 fn parse_attr(input: &str) -> IResult<&str, (&str, &str)> {
-    tuple((terminated(parse_identifier, char('=')), parse_str))(input)
+    (terminated(parse_identifier, char('=')), parse_str).parse(input)
 }
 
 fn parse_attrs(input: &str) -> IResult<&str, Vec<(&str, &str)>> {
-    many0(preceded(space0, parse_attr))(input)
+    many0(preceded(space0, parse_attr)).parse(input)
 }
 
 fn parse_str(input: &str) -> IResult<&str, &str> {
-    delimited(char('"'), take_while(|c: char| c != '"'), char('"'))(input)
+    delimited(char('"'), take_while(|c: char| c != '"'), char('"')).parse(input)
 }
 
 fn parse_identifier(input: &str) -> IResult<&str, &str> {

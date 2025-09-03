@@ -1,6 +1,6 @@
 use std::{ops::Range, path::PathBuf};
 
-use crate::{resource::Rsc, Error, PageItemId};
+use crate::{Error, PageItemId, resource::Rsc};
 
 const RSC_NAME: &str = "contents";
 

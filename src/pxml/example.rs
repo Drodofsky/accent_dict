@@ -1,19 +1,17 @@
+use super::*;
 use nom::{
+    IResult, Parser,
     branch::alt,
     character::complete::char,
     combinator::opt,
     multi::{many0, many1},
-    sequence::{preceded, tuple},
-    IResult, Parser,
+    sequence::preceded,
 };
-use serde::{Deserialize, Serialize};
-
-use super::*;
 
 pub fn parse_example(input: &str) -> IResult<&str, Example> {
     xml_tag(
         "span",
-        tuple((
+        ((
             parse_example_head,
             many1(preceded(
                 opt(char('　')),
@@ -24,7 +22,7 @@ pub fn parse_example(input: &str) -> IResult<&str, Example> {
                 )),
             )),
         ))
-        .map(|(h, a)| Example(h, a)),
+            .map(|(h, a)| Example(h, a)),
     )(input)
     .verify_class("example")
 }
@@ -45,13 +43,4 @@ fn parse_accent_example(input: &str) -> IResult<&str, Vec<AccentText>> {
         ))),
     )(input)
     .verify_class("accent accent_example")
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    #[test]
-    fn example_content_1() {
-        let s = "";
-    }
 }

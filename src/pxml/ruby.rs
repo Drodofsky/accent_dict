@@ -1,5 +1,4 @@
-use nom::{combinator::opt, sequence::tuple, IResult, Parser};
-use serde::{Deserialize, Serialize};
+use nom::IResult;
 
 use super::*;
 
@@ -12,8 +11,7 @@ fn parse_rt(input: &str) -> IResult<&str, Rt> {
 }
 
 pub fn parse_ruby(input: &str) -> IResult<&str, Ruby> {
-    xml_tag("ruby", tuple((parse_rb, parse_rt)))(input)
-        .map(|(rem, (_attr, (rb, rt)))| (rem, Ruby(rb, rt)))
+    xml_tag("ruby", (parse_rb, parse_rt))(input).map(|(rem, (_attr, (rb, rt)))| (rem, Ruby(rb, rt)))
 }
 
 #[cfg(test)]
@@ -24,11 +22,11 @@ mod test {
     #[test]
     fn ruby() {
         let s = "<span class=\"hw\">【<ruby><rb>悪</rb><rt>あく</rt></ruby><ruby><rb>辣</rb><rt>らつ</rt></ruby>】</span>";
-        let (rem, res) = parse_hw(s).unwrap();
+        let (_rem, _res) = parse_hw(s).unwrap();
     }
     #[test]
     fn rub2() {
         let s = "<ruby><rb>悪</rb><rt>あく</rt></ruby>";
-        let (rem, res) = parse_ruby(s).unwrap();
+        let (_rem, _res) = parse_ruby(s).unwrap();
     }
 }

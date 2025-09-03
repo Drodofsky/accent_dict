@@ -1,5 +1,3 @@
-use std::{any::Any, default};
-
 use pyo3::prelude::*;
 
 mod abi_utils;
@@ -7,7 +5,7 @@ mod audio;
 mod circle;
 mod dict;
 mod error;
-mod gen_svg;
+pub mod gen_svg;
 mod headline;
 mod key;
 mod pages;
@@ -151,7 +149,7 @@ fn unpack_dic_item(dic_item: DicItem) -> Vec<Unpacked> {
         let mut pron_id = 0;
 
         // accent
-        for body_content in head_g.1 .0 {
+        for body_content in head_g.1.0 {
             match body_content {
                 BodyContent::Accent(a) => pron.append(
                     &mut a
@@ -219,7 +217,7 @@ fn unpack_dic_item(dic_item: DicItem) -> Vec<Unpacked> {
 
         if !head.is_empty() {
             unpacked.push(Unpacked {
-                id: dic_item.0 .0.clone(),
+                id: dic_item.0.0.clone(),
                 head,
                 kanji,
                 pron,
@@ -234,8 +232,8 @@ fn unpack_dic_item(dic_item: DicItem) -> Vec<Unpacked> {
 fn unpack_numbers(numbers: &[Josushi]) -> Vec<Unpacked> {
     let mut unpacked = Vec::new();
     for josushi in numbers {
-        let id = &josushi.0 .0 .0;
-        let head = &josushi.0 .1;
+        let id = &josushi.0.0.0;
+        let head = &josushi.0.1;
         let mut accent_id = 0;
         let mut prons = Vec::new();
         for accent in josushi.1.iter() {

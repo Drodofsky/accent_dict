@@ -61,7 +61,7 @@ impl fmt::Display for Inner {
                 f,
                 "{}",
                 ru.iter()
-                    .map(|(r, os)| if let Some(mut s) = os.as_deref() {
+                    .map(|(r, os)| if let Some(s) = os.as_deref() {
                         let mut r = format!("{r}");
                         r.push_str(s);
                         r

@@ -1,4 +1,4 @@
-use crate::{audio::Audio, key::Keys, pages::Pages, Error};
+use crate::{Error, audio::Audio, key::Keys, pages::Pages};
 
 pub struct MonokakidoDict {
     pub pages: Pages,

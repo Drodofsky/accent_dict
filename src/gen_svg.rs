@@ -1,6 +1,6 @@
 use svg::{
-    node::element::{path::Data, Circle, Path, Text},
     Document,
+    node::element::{Circle, Path, Text, path::Data},
 };
 
 const CIRCLE: char = '\u{20dd}';

@@ -8,7 +8,7 @@ use std::{
 
 use miniz_oxide::inflate::core as zlib;
 
-use crate::{abi_utils::TransmuteSafe, resource::decompress, Error};
+use crate::{Error, abi_utils::TransmuteSafe, resource::decompress};
 
 #[derive(Debug, Clone)]
 pub(crate) struct NrscIndex {
