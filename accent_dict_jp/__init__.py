@@ -2,12 +2,12 @@ import os.path
 import random
 import string
 from aqt import mw
-from aqt.qt import *
+from aqt.qt import QMenuBar, QFont, QMenu, QWidget, QVBoxLayout, QAction, Qt
 from aqt.editor import Editor
 from aqt import gui_hooks
 from typing import Optional
 from anki.notes import Note
-from os import *
+from os import getcwd
 import base64
 from accent_dict import look_up, get_sound, gen_pitch_svg  # type: ignore
 editor_dictionary_instance = {}
@@ -76,11 +76,15 @@ class Dictionary:
         raw = get_sound(os.path.join(os.path.dirname(os.path.normpath(__file__)), "assets"), sound_file)
         if mw is None:
             return None
+        if mw.col is None:
+            return None
         mw.col.media.write_data(sound_file, bytes(raw))
 
     def save_pitch(self, pitch: str) -> None:
         pitch_svg = gen_pitch_svg(pitch)
         if mw is None:
+            return None
+        if mw.col is None:
             return None
         mw.col.media.write_data(sanitise_str(pitch) + ".svg", str.encode(pitch_svg))
 
