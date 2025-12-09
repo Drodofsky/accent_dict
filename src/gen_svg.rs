@@ -7,6 +7,7 @@ const CIRCLE: char = '\u{20dd}';
 const VOICED: char = '\u{309a}';
 const HALF_WIDTH_DAKUTEN: char = 'ﾞ';
 const HALF_WIDTH_HANDAKUTEN: char = 'ﾟ';
+const TEXT_STYLE: &'static str = "font-size:25px;font-family:sans-serif;fill:#fff;stroke:#000;stroke-width:2.2px;paint-order:stroke;";
 
 pub fn gen_svg(accent_word: &str) -> String {
     let mut doc = Document::new();
@@ -75,9 +76,11 @@ pub fn gen_svg(accent_word: &str) -> String {
             doc = draw_circle(doc, x, 5, false)
         }
         let x: usize = 16 + ((last_i + 1) * 35);
-        doc = draw_circle(doc, x, 5, false);
 
         doc = draw_path(doc, x, 5, PathType::Down, 35);
+
+        doc = draw_circle(doc, x, 5, false);
+
         let x: usize = 16 + ((last_i + 2) * 35);
         doc = draw_circle(doc, x, 30, true)
     }
@@ -116,9 +119,10 @@ pub fn gen_svg(accent_word: &str) -> String {
             doc = draw_circle(doc, x, 30, false)
         }
         let x: usize = 16 + ((last_i + last_i2 + 1) * 35);
+        doc = draw_path(doc, x, 30, PathType::Straight, 35);
+
         doc = draw_circle(doc, x, 30, false);
 
-        doc = draw_path(doc, x, 30, PathType::Straight, 35);
         let x: usize = 16 + ((last_i + last_i2 + 2) * 35);
         doc = draw_circle(doc, x, 30, true)
     }
@@ -144,10 +148,13 @@ fn draw_path(
     let data = Data::new()
         .move_to((xpos, ypos))
         .line_by((width, typ as isize));
-    let path = Path::new()
+    let inner = Path::new()
+        .set("d", data.clone())
+        .set("style", "fill:none;stroke:#fff;stroke-width:2.5;");
+    let outer = Path::new()
         .set("d", data)
-        .set("style", "fill:none;stroke:#fff;stroke-width:1.5;");
-    document.add(path)
+        .set("style", "fill:none;stroke:#000;stroke-width:4.7;");
+    document.add(outer).add(inner)
 }
 
 pub fn draw_mora(mut doc: Document, mora: &str, xpos: usize) -> Document {
@@ -161,14 +168,14 @@ pub fn draw_mora(mut doc: Document, mora: &str, xpos: usize) -> Document {
         Text::new(mora)
             .set("x", xpos)
             .set("y", 67.5)
-            .set("style", "font-size:20px;font-family:sans-serif;fill:#fff;")
+            .set("style", TEXT_STYLE)
     } else {
         let little = "ぁぅぇぉゃゅょァゥェォャュョ";
         let (l, _) = mora.split_once(|c| little.contains(c)).unwrap();
         Text::new(l)
             .set("x", xpos.saturating_sub(5))
             .set("y", 67.5)
-            .set("style", "font-size:20px;font-family:sans-serif;fill:#fff;")
+            .set("style", TEXT_STYLE)
     };
 
     doc = doc.add(text);
@@ -180,12 +187,19 @@ pub fn draw_mora(mut doc: Document, mora: &str, xpos: usize) -> Document {
     let t = Text::new(&mora[index..])
         .set("x", xpos.saturating_add(12))
         .set("y", 67.5)
-        .set("style", "font-size:20px;font-family:sans-serif;fill:#fff;");
+        .set("style", TEXT_STYLE);
 
     doc.add(t)
 }
 
 fn draw_circle(mut doc: Document, xpos: usize, ypos: usize, is_next: bool) -> Document {
+    let c_outer = Circle::new()
+        .set("r", 7.2)
+        .set("cx", xpos)
+        .set("cy", ypos)
+        .set("style", "opacity:1;fill:#000;");
+    doc = doc.add(c_outer);
+
     let c = Circle::new()
         .set("r", 5)
         .set("cx", xpos)
