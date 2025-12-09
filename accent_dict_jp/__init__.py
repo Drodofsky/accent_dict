@@ -9,7 +9,7 @@ from typing import Optional
 from anki.notes import Note
 from os import getcwd
 import base64
-from accent_dict import look_up, get_sound, gen_pitch_svg  # type: ignore
+from .accent_dict import look_up, get_sound, gen_pitch_svg  # type: ignore
 editor_dictionary_instance = {}
 
 
