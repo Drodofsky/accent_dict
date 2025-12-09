@@ -15,8 +15,8 @@ pub fn gen_svg(accent_word: &str) -> String {
     let mora_len = mora.len();
     let svg_width = (mora_len.saturating_sub(1) * 35) + 32;
     doc = doc.set("width", svg_width);
-    doc = doc.set("height", 75);
-    doc = doc.set("viewBox", (0, 0, svg_width, 75));
+    doc = doc.set("height", 90);
+    doc = doc.set("viewBox", (0, 0, svg_width, 90));
 
     // draw text
     for (pos, m) in mora
@@ -32,23 +32,23 @@ pub fn gen_svg(accent_word: &str) -> String {
     // draw accent pattern
     // heiban
     if mora.last().unwrap() == "▔" {
-        doc = draw_path(doc, 16, 30, PathType::Up, 35);
-        doc = draw_circle(doc, 16, 30, false);
+        doc = draw_path(doc, 16, 40, PathType::Up, 35);
+        doc = draw_circle(doc, 16, 40, false);
 
         for (i, m) in mora.iter().enumerate().skip(1) {
             let x = 16 + (i * 35);
             if m == "▔" {
-                doc = draw_circle(doc, x, 5, true)
+                doc = draw_circle(doc, x, 15, true)
             } else {
-                doc = draw_path(doc, x, 5, PathType::Straight, 35);
-                doc = draw_circle(doc, x, 5, false)
+                doc = draw_path(doc, x, 15, PathType::Straight, 35);
+                doc = draw_circle(doc, x, 15, false)
             }
         }
     }
     /* atama daka */
     else if mora.get(1).unwrap() == "＼" {
-        doc = draw_path(doc, 16, 5, PathType::Down, 35);
-        doc = draw_circle(doc, 16, 5, false);
+        doc = draw_path(doc, 16, 15, PathType::Down, 35);
+        doc = draw_circle(doc, 16, 15, false);
         let mut last_i = 0;
         for (i, _m) in mora
             .iter()
@@ -58,36 +58,36 @@ pub fn gen_svg(accent_word: &str) -> String {
         {
             let x: usize = 16 + (i * 35);
             last_i = i;
-            doc = draw_path(doc, x, 30, PathType::Straight, 35);
-            doc = draw_circle(doc, x, 30, false)
+            doc = draw_path(doc, x, 40, PathType::Straight, 35);
+            doc = draw_circle(doc, x, 40, false)
         }
         let x: usize = 16 + ((last_i + 1) * 35);
-        doc = draw_circle(doc, x, 30, true)
+        doc = draw_circle(doc, x, 40, true)
     }
     /* o daka */
     else if mora.last().unwrap() == "＼" {
-        doc = draw_path(doc, 16, 30, PathType::Up, 35);
-        doc = draw_circle(doc, 16, 30, false);
+        doc = draw_path(doc, 16, 40, PathType::Up, 35);
+        doc = draw_circle(doc, 16, 40, false);
         let mut last_i = 0;
         for (i, _m) in mora.iter().skip(2).enumerate().skip(1) {
             let x: usize = 16 + (i * 35);
             last_i = i;
-            doc = draw_path(doc, x, 5, PathType::Straight, 35);
-            doc = draw_circle(doc, x, 5, false)
+            doc = draw_path(doc, x, 15, PathType::Straight, 35);
+            doc = draw_circle(doc, x, 15, false)
         }
         let x: usize = 16 + ((last_i + 1) * 35);
 
-        doc = draw_path(doc, x, 5, PathType::Down, 35);
+        doc = draw_path(doc, x, 15, PathType::Down, 35);
 
-        doc = draw_circle(doc, x, 5, false);
+        doc = draw_circle(doc, x, 15, false);
 
         let x: usize = 16 + ((last_i + 2) * 35);
-        doc = draw_circle(doc, x, 30, true)
+        doc = draw_circle(doc, x, 40, true)
     }
     /* naka daka */
     else {
-        doc = draw_path(doc, 16, 30, PathType::Up, 35);
-        doc = draw_circle(doc, 16, 30, false);
+        doc = draw_path(doc, 16, 40, PathType::Up, 35);
+        doc = draw_circle(doc, 16, 40, false);
         let mut last_i = 0;
         let mut last_i2 = 0;
         for (i, _m) in mora
@@ -99,12 +99,12 @@ pub fn gen_svg(accent_word: &str) -> String {
         {
             let x: usize = 16 + (i * 35);
             last_i = i;
-            doc = draw_path(doc, x, 5, PathType::Straight, 35);
-            doc = draw_circle(doc, x, 5, false)
+            doc = draw_path(doc, x, 15, PathType::Straight, 35);
+            doc = draw_circle(doc, x, 15, false)
         }
         let x: usize = 16 + ((last_i + 1) * 35);
-        doc = draw_path(doc, x, 5, PathType::Down, 35);
-        doc = draw_circle(doc, x, 5, false);
+        doc = draw_path(doc, x, 15, PathType::Down, 35);
+        doc = draw_circle(doc, x, 15, false);
         last_i = last_i + 1;
         for (i, _m) in mora
             .iter()
@@ -115,16 +115,16 @@ pub fn gen_svg(accent_word: &str) -> String {
         {
             let x: usize = 16 + ((i + last_i) * 35);
             last_i2 = i;
-            doc = draw_path(doc, x, 30, PathType::Straight, 35);
-            doc = draw_circle(doc, x, 30, false)
+            doc = draw_path(doc, x, 40, PathType::Straight, 35);
+            doc = draw_circle(doc, x, 40, false)
         }
         let x: usize = 16 + ((last_i + last_i2 + 1) * 35);
-        doc = draw_path(doc, x, 30, PathType::Straight, 35);
+        doc = draw_path(doc, x, 40, PathType::Straight, 35);
 
-        doc = draw_circle(doc, x, 30, false);
+        doc = draw_circle(doc, x, 40, false);
 
         let x: usize = 16 + ((last_i + last_i2 + 2) * 35);
-        doc = draw_circle(doc, x, 30, true)
+        doc = draw_circle(doc, x, 40, true)
     }
 
     println!("{}", doc.to_string());
@@ -167,14 +167,14 @@ pub fn draw_mora(mut doc: Document, mora: &str, xpos: usize) -> Document {
     let text = if mora_len == 1 {
         Text::new(mora)
             .set("x", xpos)
-            .set("y", 67.5)
+            .set("y", 77.5)
             .set("style", TEXT_STYLE)
     } else {
         let little = "ぁぅぇぉゃゅょァゥェォャュョ";
         let (l, _) = mora.split_once(|c| little.contains(c)).unwrap();
         Text::new(l)
             .set("x", xpos.saturating_sub(5))
-            .set("y", 67.5)
+            .set("y", 77.5)
             .set("style", TEXT_STYLE)
     };
 
@@ -186,7 +186,7 @@ pub fn draw_mora(mut doc: Document, mora: &str, xpos: usize) -> Document {
     let index = mora.find(|c| little.contains(c)).unwrap();
     let t = Text::new(&mora[index..])
         .set("x", xpos.saturating_add(12))
-        .set("y", 67.5)
+        .set("y", 77.5)
         .set("style", TEXT_STYLE);
 
     doc.add(t)
