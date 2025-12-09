@@ -89,7 +89,7 @@ jobs:
           cp artifacts/accent_dict-ubuntu-latest/*.so addon_out/
           cp artifacts/accent_dict-windows-latest/*.pyd addon_out/
           cp artifacts/accent_dict-macos-latest/*.so addon_out/
-          cp artifacts/accent_dict-macos-14/*.so addon_out/
+          cp artifacts/accent_dict-macos-15-intel/*.so addon_out/
 
           cd addon_out
           zip -r ../accent_dict_jp.ankiaddon *
