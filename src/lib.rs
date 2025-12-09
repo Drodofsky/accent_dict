@@ -47,7 +47,10 @@ fn accent_dict(m: &Bound<'_, PyModule>) -> PyResult<()> {
 }
 
 fn _look_up(path: &str, vocab: &str) -> Vec<Unpacked> {
-    let mut dict = MonokakidoDict::open_with_path(path).unwrap();
+    let mut dict = match MonokakidoDict::open_with_path(path) {
+        Ok(dict) => dict,
+        Err(_e) => return Vec::new(),
+    };
     let mut unpacked: Vec<Unpacked> = Vec::new();
 
     // is dict index
