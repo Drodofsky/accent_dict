@@ -115,7 +115,7 @@ class Dictionary:
     
 
     def save_audio(self, sound_file: str) -> None:
-        raw = get_sound(os.path.join(os.path.dirname(os.path.normpath(__file__)), "assets"), sound_file)
+        raw = get_sound(os.path.join(os.path.dirname(os.path.normpath(__file__)), "user_files/assets"), sound_file)
         if mw is None:
             return None
         if mw.col is None:
@@ -141,7 +141,7 @@ class Dictionary:
             self.save_audio(sound_file)
 
     def get_assets_folder(self) ->str:
-        path = os.path.join(os.path.dirname(os.path.normpath(__file__)), "assets")
+        path = os.path.join(os.path.dirname(os.path.normpath(__file__)), "user_files/assets")
         if not Path(path).exists():
             showCritical("Accent Dict Add-on Error\n\n"
                 "The required 'assets' folder is missing.\n\n"
