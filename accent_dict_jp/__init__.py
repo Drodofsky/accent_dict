@@ -44,22 +44,9 @@ class Dictionary:
         self.container_widget.setLayout(self.container_layout)
         self.editor.outerLayout.insertWidget(0, self.container_widget)
 
-        # init dict
-        self.vocab = ""
         print("addon_path: " + getcwd())
 
-    def update_vocab(self, note: Note) -> None:
-        tp = note.note_type()
-        if tp is None:
-            return None
-        for idx, field in enumerate(tp["flds"]):
-            if field["name"] == "dict":
-                front_content = note.fields[idx]
-                if self.vocab != front_content:
-                    self.vocab = front_content
-                    print(self.vocab)
-
-    def update_field(self, field_name: str, val: str) -> None:
+    def set_field(self, field_name: str, val: str) -> None:
         note = self.editor.note
         if note is None:
             return None
@@ -71,6 +58,19 @@ class Dictionary:
                 note.fields[idx] = val
                 self.editor.set_note(note)
                 self.editor.loadNote()
+    
+    def get_field(self, field_name: str) -> Optional[str]:
+        note = self.editor.note
+        if note is None:
+            return None
+        tp = note.note_type()
+        if tp is None:
+            return None
+        for idx, field in enumerate(tp["flds"]):
+            if field["name"] == field_name:
+                return note.fields[idx]
+        return None
+    
 
     def save_audio(self, sound_file: str) -> None:
         raw = get_sound(os.path.join(os.path.dirname(os.path.normpath(__file__)), "assets"), sound_file)
@@ -89,18 +89,21 @@ class Dictionary:
         mw.col.media.write_data(sanitise_str(pitch) + ".svg", str.encode(pitch_svg))
 
     def write_voc(self, id: str, sound_file: Optional[str], pitch: str, voc: str) -> None:
-        self.update_field("dict", id)
-        self.update_field("voc", voc)
-        self.update_field("pitch", '<img src="' + sanitise_str(pitch) + '.svg">')
+        self.set_field("dict", id)
+        self.set_field("voc", voc)
+        self.set_field("pitch", '<img src="' + sanitise_str(pitch) + '.svg">')
         self.save_pitch(pitch)
 
         if sound_file is not None:
-            self.update_field("audio", "[sound:" + sound_file + "]")
+            self.set_field("audio", "[sound:" + sound_file + "]")
             self.save_audio(sound_file)
 
     def regenerated_actions(self):
         self.dict_menu.clear()
-        vocabs = look_up(os.path.join(os.path.dirname(os.path.normpath(__file__)), "assets"), self.vocab)
+        vocab_str = self.get_field("dict")
+        vocabs = []
+        if vocab_str is not None:
+            vocabs = look_up(os.path.join(os.path.dirname(os.path.normpath(__file__)), "assets"), vocab_str)
         for vocab in vocabs:
             vocab_menu = QMenu(vocab.head, self.editor.parentWindow)
 
@@ -118,11 +121,4 @@ class Dictionary:
 def create_dict(editor: Editor) -> None:
     editor_dictionary_instance[editor] = Dictionary(editor)
 
-
-def on_text_update(note: Note) -> None:
-    for dict in editor_dictionary_instance.values():
-        dict.update_vocab(note)
-
-
 gui_hooks.editor_did_init.append(create_dict)
-gui_hooks.editor_did_fire_typing_timer.append(on_text_update)
