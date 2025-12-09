@@ -28,8 +28,18 @@ jobs:
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
 
-      - name: Build with cargo (release)
+      # Linux + Windows
+      - name: Build with cargo (non-macOS)
+        if: runner.os != 'macOS'
         run: cargo build --release
+
+      # macOS (Intel + ARM)
+      - name: Build with cargo (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          export RUSTFLAGS="-C link-arg=-undefined -C link-arg=dynamic_lookup"
+          cargo build --release
+
 
       - name: Collect built binary
         shell: bash
