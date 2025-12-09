@@ -90,11 +90,10 @@ jobs:
         
 
           # Binaries aus den Artefakten ins Addon kopieren
-          cp artifacts/accent_dict-ubuntu-latest/accent_dict.linux-x86_64.so addon_out/accent_dict_jp/
-          cp artifacts/accent_dict-windows-latest/accent_dict.windows-x86_64.pyd addon_out/accent_dict_jp/
-          cp artifacts/accent_dict-macos-latest/accent_dict.macos-x86_64.so addon_out/accent_dict_jp/
-          cp artifacts/accent_dict-macos-14/accent_dict.macos-arm64.so addon_out/accent_dict_jp/
-
+          cp artifacts/accent_dict-ubuntu-latest/*.so addon_out/accent_dict_jp/
+          cp artifacts/accent_dict-windows-latest/*.pyd addon_out/accent_dict_jp/
+          cp artifacts/accent_dict-macos-latest/*.so addon_out/accent_dict_jp/
+          cp artifacts/accent_dict-macos-14/*.so addon_out/accent_dict_jp/
           # .ankiaddon (Zip) bauen
           cd addon_out
           zip -r ../accent_dict_jp.ankiaddon .
