@@ -1,0 +1,58 @@
+name: Build accent_dict binaries
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+          - os: windows-latest
+          - os: macos-latest    # Intel mac
+          - os: macos-14        # Apple Silicon
+
+    env:
+      # tell pyo3 we're building a Python extension module
+      PYO3_BUILD_EXTENSION_MODULE: "1"
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Build with cargo (release)
+        run: cargo build --release
+
+      - name: Collect built binary
+        shell: bash
+        run: |
+          mkdir -p dist
+          case "${{ runner.os }}" in
+            Linux)
+              # target/release/libaccent_dict.so -> accent_dict.linux-x86_64.so
+              cp target/release/libaccent_dict.so dist/accent_dict.linux-x86_64.so
+              ;;
+            macOS)
+              # target/release/libaccent_dict.dylib -> accent_dict.macos-$(arch).so
+              arch="$(uname -m)"
+              cp target/release/libaccent_dict.dylib "dist/accent_dict.macos-${arch}.so"
+              ;;
+            Windows)
+              # target\release\accent_dict.dll -> accent_dict.windows-x86_64.pyd
+              cp target/release/accent_dict.dll dist/accent_dict.windows-x86_64.pyd
+              ;;
+          esac
+
+      - name: Upload binary artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: accent_dict-${{ matrix.os }}
+          path: dist/*
