@@ -13,6 +13,7 @@ from pathlib import Path
 import platform
 import importlib.util
 import sys
+from aqt.utils import showCritical
 editor_dictionary_instance = {}
 
 
@@ -139,12 +140,22 @@ class Dictionary:
             self.set_field("audio", "[sound:" + sound_file + "]")
             self.save_audio(sound_file)
 
+    def get_assets_folder(self) ->str:
+        path = os.path.join(os.path.dirname(os.path.normpath(__file__)), "assets")
+        if not Path(path).exists():
+            showCritical("Accent Dict Add-on Error\n\n"
+                "The required 'assets' folder is missing.\n\n"
+                "This folder contains essential files needed for the add-on to work.\n\n"
+            )
+        return path
+    
+
     def regenerated_actions(self):
         self.dict_menu.clear()
         vocab_str = self.get_field("dict")
         vocabs = []
         if vocab_str is not None:
-            vocabs = look_up(os.path.join(os.path.dirname(os.path.normpath(__file__)), "assets"), vocab_str)
+            vocabs = look_up(self.get_assets_folder(), vocab_str)
         for vocab in vocabs:
             vocab_menu = QMenu(vocab.head, self.editor.parentWindow)
 
