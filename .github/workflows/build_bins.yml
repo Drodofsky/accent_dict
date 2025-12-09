@@ -14,8 +14,8 @@ jobs:
         include:
           - os: ubuntu-latest
           - os: windows-latest
-          - os: macos-latest    # Intel mac
-          - os: macos-14        # Apple Silicon
+          - os: macos-latest 
+          - os: macos-13
 
     env:
       # tell pyo3 we're building a Python extension module
