@@ -9,8 +9,49 @@ from typing import Optional
 from anki.notes import Note
 from os import getcwd
 import base64
-from .accent_dict import look_up, get_sound, gen_pitch_svg  # type: ignore
+from pathlib import Path
+import platform
+import importlib.util
+import sys
 editor_dictionary_instance = {}
+
+
+def _select_native_lib() -> Optional[Path]:
+    system = platform.system()
+    machine = platform.machine().lower()
+    filename = ""
+    if system == "Windows":
+        filename = "accent_dict.windows-x86_64.pyd"
+    elif system == "Linux":
+        filename = "accent_dict.linux-x86_64.so"
+    elif system == "Darwin":
+        if "arm" in machine or "aarch64" in machine:
+            filename = "accent_dict.macos-arm64.so"
+        else:
+            filename = "accent_dict.macos-x86_64.so"
+    else:
+        return None;
+    
+    return  Path(os.path.join(os.path.dirname(os.path.normpath(__file__)), filename))
+
+    
+def _load_native_module():
+    lib_path = _select_native_lib()
+    module_name = f"{__name__}.accent_dict"
+    spec = importlib.util.spec_from_file_location(module_name, lib_path)
+    if spec is None or spec.loader is None:
+        raise RuntimeError(f"Failed to load import spec for {lib_path}")
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[module_name] = module
+    spec.loader.exec_module(module)
+    return module
+
+
+_native = _load_native_module()
+
+look_up = _native.look_up
+get_sound = _native.get_sound
+gen_pitch_svg = _native.gen_pitch_svg
 
 
 def sanitise_str(s: str) -> str:
