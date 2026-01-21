@@ -77,20 +77,14 @@ fn _look_up(path: &str, vocab: &str, word_type: Option<WordType>) -> Vec<Unpacke
         let search_compound = word_type.is_none() || word_type == Some(WordType::Compound);
         let search_numeral = word_type.is_none() || word_type == Some(WordType::Counter);
 
-        if search_headword {
-            if let Ok((_, hw_pages)) = dict.headword_keys.search_exact(vocab) {
-                pages.push(hw_pages);
-            }
+        if search_headword && let Ok((_, hw_pages)) = dict.headword_keys.search_exact(vocab) {
+            pages.push(hw_pages);
         }
-        if search_compound {
-            if let Ok((_, compound_pages)) = dict.compound_keys.search_exact(vocab) {
-                pages.push(compound_pages);
-            }
+        if search_compound && let Ok((_, compound_pages)) = dict.compound_keys.search_exact(vocab) {
+            pages.push(compound_pages);
         }
-        if search_numeral {
-            if let Ok((_, numeral_pages)) = dict.numeral_keys.search_exact(vocab) {
-                pages.push(numeral_pages);
-            }
+        if search_numeral && let Ok((_, numeral_pages)) = dict.numeral_keys.search_exact(vocab) {
+            pages.push(numeral_pages);
         }
         if pages.is_empty() {
             return vec![Unpacked {
