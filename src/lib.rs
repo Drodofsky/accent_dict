@@ -20,9 +20,9 @@ pub use key::{KeyIndex, Keys, PageItemId};
 pub use pages::{Pages, XmlParser};
 pub use pxml::*;
 
-#[pyfunction]
-fn look_up(path: String, vocab: String) -> Vec<Unpacked> {
-    _look_up(&path, &vocab)
+#[pyfunction(signature = (path, vocab, word_type=None))]
+fn look_up(path: String, vocab: String, word_type: Option<WordType>) -> Vec<Unpacked> {
+    _look_up(&path, &vocab, word_type)
 }
 
 #[pyfunction]
@@ -43,10 +43,11 @@ fn accent_dict(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(look_up, m)?)?;
     m.add_function(wrap_pyfunction!(get_sound, m)?)?;
     m.add_function(wrap_pyfunction!(gen_pitch_svg, m)?)?;
+    m.add_class::<WordType>()?;
     Ok(())
 }
 
-fn _look_up(path: &str, vocab: &str) -> Vec<Unpacked> {
+fn _look_up(path: &str, vocab: &str, word_type: Option<WordType>) -> Vec<Unpacked> {
     let mut dict = match MonokakidoDict::open_with_path(path) {
         Ok(dict) => dict,
         Err(_e) => return Vec::new(),
@@ -72,14 +73,24 @@ fn _look_up(path: &str, vocab: &str) -> Vec<Unpacked> {
     } else {
         let mut pages = Vec::new();
 
-        if let Ok((_, hw_pages)) = dict.headword_keys.search_exact(vocab) {
-            pages.push(hw_pages);
+        let search_headword = word_type.is_none() || word_type == Some(WordType::HEADWORD);
+        let search_compound = word_type.is_none() || word_type == Some(WordType::Compound);
+        let search_numeral = word_type.is_none() || word_type == Some(WordType::Counter);
+
+        if search_headword {
+            if let Ok((_, hw_pages)) = dict.headword_keys.search_exact(vocab) {
+                pages.push(hw_pages);
+            }
         }
-        if let Ok((_, compound_pages)) = dict.compound_keys.search_exact(vocab) {
-            pages.push(compound_pages);
+        if search_compound {
+            if let Ok((_, compound_pages)) = dict.compound_keys.search_exact(vocab) {
+                pages.push(compound_pages);
+            }
         }
-        if let Ok((_, numeral_pages)) = dict.numeral_keys.search_exact(vocab) {
-            pages.push(numeral_pages);
+        if search_numeral {
+            if let Ok((_, numeral_pages)) = dict.numeral_keys.search_exact(vocab) {
+                pages.push(numeral_pages);
+            }
         }
         if pages.is_empty() {
             return vec![Unpacked {
@@ -98,6 +109,14 @@ fn _look_up(path: &str, vocab: &str) -> Vec<Unpacked> {
     }
 
     unpacked
+}
+
+#[pyclass]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum WordType {
+    HEADWORD = 1,
+    Compound = 2,
+    Counter = 3,
 }
 
 #[derive(Debug, Default)]
