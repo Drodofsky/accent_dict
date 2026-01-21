@@ -89,7 +89,6 @@ pub(crate) fn read_vec<T: TransmuteSafe>(
     if start == 0 || end == 0 {
         return Ok(None);
     }
-    // Replace this with div_ceil once it stabilizes
     let size = (end - start).div_ceil(size_of::<T>());
     let mut buf = vec![T::default(); size];
     file.read_exact(T::slice_as_bytes_mut(&mut buf))?;
