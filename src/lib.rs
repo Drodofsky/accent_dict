@@ -74,8 +74,8 @@ fn _look_up(path: &str, vocab: &str, word_type: Option<WordType>) -> Vec<Unpacke
         let mut pages = Vec::new();
 
         let search_headword = word_type.is_none() || word_type == Some(WordType::HEADWORD);
-        let search_compound = word_type.is_none() || word_type == Some(WordType::Compound);
-        let search_numeral = word_type.is_none() || word_type == Some(WordType::Counter);
+        let search_compound = word_type.is_none() || word_type == Some(WordType::COMPOUND);
+        let search_numeral = word_type.is_none() || word_type == Some(WordType::COUNTER);
 
         if search_headword && let Ok((_, hw_pages)) = dict.headword_keys.search_exact(vocab) {
             pages.push(hw_pages);
@@ -109,8 +109,8 @@ fn _look_up(path: &str, vocab: &str, word_type: Option<WordType>) -> Vec<Unpacke
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum WordType {
     HEADWORD = 1,
-    Compound = 2,
-    Counter = 3,
+    COMPOUND = 2,
+    COUNTER = 3,
 }
 
 #[derive(Debug, Default)]
