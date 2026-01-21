@@ -119,12 +119,12 @@ fn parse_h(input: &str) -> IResult<&str, Vec<H>> {
         "span",
         many0(alt((
             parse_headword.map(|x| H::Headword(x.into())),
-            parse_hw.map(|(hw, o)| H::HW(hw.into(), o.map(|(l, r)| (l, r)))),
+            parse_hw.map(|(hw, o)| H::HW(hw.into(), o)),
             parse_round_brackets.map(|x| H::RoundBrackets(x.into())),
             parse_square_brackets.map(|x| H::SquareBrackets(x.into())),
             parse_square_box.map(|x| H::SquareBox(x.into())),
             parse_subheadword,
-            parse_black_branckets.map(|(b, o)| H::BlackBranckets(b.into(), o.map(|(l, r)| (l, r)))),
+            parse_black_branckets.map(|(b, o)| H::BlackBranckets(b.into(), o)),
             parse_d_angle_brackets.map(|s| H::DAngleBrackets(s.into())),
             parse_angle_brackets.map(|s| H::AngleBrackets(s.into())),
             parse_dia.map(|s| H::Dia(s.into())),
@@ -217,7 +217,7 @@ fn parse_refhead(input: &str) -> IResult<&str, Vec<RefHead>> {
         many1(alt((
             parse_refheadword.map(|s| RefHead::Refheadword(s.into())),
             parse_black_branckets
-                .map(|(b, d)| RefHead::BlackBranckets(b.into(), d.map(|(d, r)| (d, r)))),
+                .map(|(b, d)| RefHead::BlackBranckets(b.into(), d)),
             parse_d_angle_brackets.map(|s| RefHead::DAngleBrackets(s.into())),
             parse_round_brackets.map(|s| RefHead::RoundBrackets(s.into())),
             parse_square_brackets.map(|s| RefHead::SquareBrackets(s.into())),
