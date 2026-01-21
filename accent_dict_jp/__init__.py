@@ -75,10 +75,24 @@ class Dictionary:
         self.font = QFont()
         self.font.setPointSize(20)
         self.menubar.setFont(self.font)
-        self.dict_menu = QMenu("Dict", self.menubar)
-        self.dict_menu.setFont(self.font)
-        self.dict_menu.aboutToShow.connect(self.regenerated_actions)
-        self.menubar.addMenu(self.dict_menu)
+
+        self.headword_menu = QMenu("見出", self.menubar)
+        self.headword_menu.setFont(self.font)
+        self.headword_menu.aboutToShow.connect(self.regenerated_actions)
+
+        
+        self.compound_menu = QMenu("複合名詞", self.menubar)
+        self.compound_menu.setFont(self.font)
+        self.compound_menu.aboutToShow.connect(self.regenerated_actions)
+
+        self.counter_menu = QMenu("助数詞", self.menubar)
+        self.counter_menu.setFont(self.font)
+        self.counter_menu.aboutToShow.connect(self.regenerated_actions)
+    
+        self.menubar.addMenu(self.headword_menu)
+        self.menubar.addMenu(self.compound_menu)
+        self.menubar.addMenu(self.counter_menu)
+
 
         self.container_widget = QWidget(editor.widget)
         self.container_layout = QVBoxLayout()
@@ -151,7 +165,7 @@ class Dictionary:
     
 
     def regenerated_actions(self):
-        self.dict_menu.clear()
+        self.headword_menu.clear()
         vocab_str = self.get_field("dict")
         vocabs = []
         if vocab_str is not None:
@@ -167,7 +181,7 @@ class Dictionary:
                            voc=vocab.head: self.write_voc(id, sound_file, pitch, voc))
                 vocab_menu.addAction(pron_action)
 
-            self.dict_menu.addMenu(vocab_menu)
+            self.headword_menu.addMenu(vocab_menu)
 
 
 def create_dict(editor: Editor) -> None:
