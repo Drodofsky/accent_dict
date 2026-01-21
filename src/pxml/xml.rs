@@ -82,13 +82,13 @@ impl<'s> Verify<'s, ()> for IResult<&'s str, Vec<(&'s str, &'s str)>> {
 pub fn kana(input: &str) -> IResult<&str, &str> {
     //take_while(|c: char| c != '<')(input)
     //take_until("<")(input)
-    take_while1(|c: char| (c >= 'あ' && c <= '゜') || (c >= 'ァ' && c <= 'ー'))(input)
+    take_while1(|c: char| ('あ'..='゜').contains(&c) || ('ァ'..='ー').contains(&c))(input)
 }
 
 pub fn kanji(input: &str) -> IResult<&str, &str> {
     //take_while(|c: char| c != '<')(input)
     //take_until("<")(input)
-    take_while1(|c: char| c >= '一' && c <= '龜')(input)
+    take_while1(|c: char| ('一'..='龜').contains(&c))(input)
 }
 
 pub fn text(input: &str) -> IResult<&str, &str> {
@@ -101,9 +101,9 @@ pub fn h_text(input: &str) -> IResult<&str, &str> {
     //take_while(|c: char| c != '<')(input)
     //take_until("<")(input)
     take_while1(|c: char| {
-        (c >= '一' && c <= '龜')
-            || (c >= 'あ' && c <= '゜')
-            || (c >= 'ァ' && c <= 'ー')
+        ('一'..='龜').contains(&c)
+            || ('あ'..='゜').contains(&c)
+            || ('ァ'..='ー').contains(&c)
             || (c == '，')
     })(input)
 }
@@ -112,9 +112,9 @@ pub fn ref_text(input: &str) -> IResult<&str, &str> {
     //take_while(|c: char| c != '<')(input)
     //take_until("<")(input)
     take_while1(|c: char| {
-        (c >= '一' && c <= '龜')
-            || (c >= 'あ' && c <= '゜')
-            || (c >= 'ァ' && c <= 'ー')
+        ('一'..='龜').contains(&c)
+            || ('あ'..='゜').contains(&c)
+            || ('ァ'..='ー').contains(&c)
             || (c == '☞')
             || (c == '［')
             || (c == '］')

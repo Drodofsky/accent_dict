@@ -10,12 +10,12 @@ use nom::{
 pub fn parse_josuhi(input: &str) -> IResult<&str, Josushi> {
     xml_tag(
         "div",
-        ((
+        (
             alt((parse_subhead_number, parse_subheadword_josushi)),
             many1(parse_accent),
             many0(parse_indet),
             opt(parse_note),
-        ))
+        )
             .map(|(n, a, i, note)| Josushi(n, a, i, note)),
     )(input)
     .verify_class("josushi")
@@ -54,7 +54,7 @@ fn parse_note(input: &str) -> IResult<&str, Notes> {
                 ))),
             ),
         ))
-        .map(|n| Notes(n)),
+        .map(Notes),
     )(input)
     .verify_class("note")
 }

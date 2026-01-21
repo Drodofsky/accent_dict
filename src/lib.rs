@@ -34,7 +34,7 @@ fn gen_pitch_svg(pitch_pattern: String) -> String {
 fn get_sound(path: String, file_name: String) -> Vec<u8> {
     let file_name = file_name.strip_suffix(".aac").unwrap_or(&file_name);
     let mut dict = MonokakidoDict::open_with_path(&path).unwrap();
-    dict.audio.get(&file_name).unwrap().to_vec()
+    dict.audio.get(file_name).unwrap().to_vec()
 }
 
 /// A Python module implemented in Rust.
@@ -81,7 +81,7 @@ fn _look_up(path: &str, vocab: &str) -> Vec<Unpacked> {
         if let Ok((_, numeral_pages)) = dict.numeral_keys.search_exact(vocab) {
             pages.push(numeral_pages);
         }
-        if pages.len() == 0 {
+        if pages.is_empty() {
             return vec![Unpacked {
                 id: "0".to_string(),
                 head: "<not found>".to_string(),
@@ -133,21 +133,18 @@ fn unpack_dic_item(dic_item: DicItem) -> Vec<Unpacked> {
         let mut kanji = None;
 
         // head, kanji
-        match head_g.0 {
-            Head::H(h) => {
-                head = h.iter().map(|h| format!("{h} ")).collect();
-                for i in h {
-                    if let H::HW(s, i) = i {
-                        let mut s = s.chars();
-                        s.next();
-                        if i.is_none() {
-                            s.next_back();
-                            kanji = Some(s.collect())
-                        }
+        if let Head::H(h) = head_g.0 {
+            head = h.iter().map(|h| format!("{h} ")).collect();
+            for i in h {
+                if let H::HW(s, i) = i {
+                    let mut s = s.chars();
+                    s.next();
+                    if i.is_none() {
+                        s.next_back();
+                        kanji = Some(s.collect())
                     }
                 }
             }
-            _ => {}
         }
         let mut pron_id = 0;
 
@@ -171,8 +168,8 @@ fn unpack_dic_item(dic_item: DicItem) -> Vec<Unpacked> {
                 ),
                 BodyContent::ConTable(c) => {
                     for c_conent in c {
-                        match c_conent {
-                            ConTableContent::Accent(a) => pron.append(
+                        if let ConTableContent::Accent(a) = c_conent {
+                            pron.append(
                                 &mut a
                                     .iter()
                                     .map(|a| {
@@ -186,8 +183,7 @@ fn unpack_dic_item(dic_item: DicItem) -> Vec<Unpacked> {
                                         p
                                     })
                                     .collect(),
-                            ),
-                            _ => {}
+                            )
                         }
                     }
                 }
@@ -200,7 +196,7 @@ fn unpack_dic_item(dic_item: DicItem) -> Vec<Unpacked> {
                     let p = Pron {
                         id: format!("{pron_id}"),
                         accent: format!("{a}"),
-                        sound_file: sound_file,
+                        sound_file,
                     };
                     pron_id += 1;
                     pron.push(p)
@@ -210,12 +206,11 @@ fn unpack_dic_item(dic_item: DicItem) -> Vec<Unpacked> {
         }
 
         // fixes duplicated pron in verbs
-        if let Some(a) = pron.get(0) {
-            if let Some(b) = pron.get(1) {
-                if a == b {
-                    pron.remove(0);
-                }
-            }
+        if let Some(a) = pron.first()
+            && let Some(b) = pron.get(1)
+            && a == b
+        {
+            pron.remove(0);
         }
 
         if !head.is_empty() {
@@ -274,9 +269,8 @@ fn unpack_numbers(numbers: &[Josushi]) -> Vec<Unpacked> {
 
 fn get_sound_id(accent: &Accent) -> Option<String> {
     for at in accent.1.iter() {
-        match at {
-            AccentText::Sound(s) => return Some(s.clone()),
-            _ => {}
+        if let AccentText::Sound(s) = at {
+            return Some(s.clone());
         }
     }
     None

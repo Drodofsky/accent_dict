@@ -11,7 +11,7 @@ use nom::{
 pub fn parse_example(input: &str) -> IResult<&str, Example> {
     xml_tag(
         "span",
-        ((
+        (
             parse_example_head,
             many1(preceded(
                 opt(char('　')),
@@ -21,7 +21,7 @@ pub fn parse_example(input: &str) -> IResult<&str, Example> {
                     parse_square_brackets.map(|s| ExampleContent::SquareBrackets(s.into())),
                 )),
             )),
-        ))
+        )
             .map(|(h, a)| Example(h, a)),
     )(input)
     .verify_class("example")

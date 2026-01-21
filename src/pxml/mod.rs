@@ -26,7 +26,7 @@ pub fn parse_xml(xml: &str) -> DicItem {
 ",
         )
         .unwrap();
-    let (rem, dic_item) = parse_html(xml).expect(&format!("failed to parse\n{xml}\n"));
+    let (rem, dic_item) = parse_html(xml).unwrap_or_else(|_| panic!("failed to parse\n{xml}\n"));
     assert!(rem.trim().is_empty());
     dic_item
 }
@@ -63,10 +63,10 @@ fn parse_dic_item(input: &str) -> IResult<&str, DicItem> {
 fn parse_head_g(input: &str) -> IResult<&str, HeadG> {
     xml_tag(
         "span",
-        ((
+        (
             alt((parse_dic_head, parse_dic_head_empty)),
             alt((parse_dic_body, parse_dic_body_empty)),
-        ))
+        )
             .map(|(h, b)| HeadG(h, b)),
     )(input)
     .verify_class("head-g")
@@ -119,13 +119,12 @@ fn parse_h(input: &str) -> IResult<&str, Vec<H>> {
         "span",
         many0(alt((
             parse_headword.map(|x| H::Headword(x.into())),
-            parse_hw.map(|(hw, o)| H::HW(hw.into(), o.map(|(l, r)| (l, r.into())))),
+            parse_hw.map(|(hw, o)| H::HW(hw.into(), o.map(|(l, r)| (l, r)))),
             parse_round_brackets.map(|x| H::RoundBrackets(x.into())),
             parse_square_brackets.map(|x| H::SquareBrackets(x.into())),
             parse_square_box.map(|x| H::SquareBox(x.into())),
             parse_subheadword,
-            parse_black_branckets
-                .map(|(b, o)| H::BlackBranckets(b.into(), o.map(|(l, r)| (l, r.into())))),
+            parse_black_branckets.map(|(b, o)| H::BlackBranckets(b.into(), o.map(|(l, r)| (l, r)))),
             parse_d_angle_brackets.map(|s| H::DAngleBrackets(s.into())),
             parse_angle_brackets.map(|s| H::AngleBrackets(s.into())),
             parse_dia.map(|s| H::Dia(s.into())),
@@ -146,7 +145,7 @@ fn parse_hw(input: &str) -> IResult<&str, (&str, Option<(Vec<Inner>, char)>)> {
             opt((
                 many1(alt((
                     parse_d_angle_brackets.map(|s| Inner::DAngleBrackets(DAngleBrackets(s.into()))),
-                    many1((parse_ruby, opt(kana.map(|s| s.to_string())))).map(|r| Inner::Ruby(r)),
+                    many1((parse_ruby, opt(kana.map(|s| s.to_string())))).map(Inner::Ruby),
                     parse_round_brackets.map(|r| Inner::RoundBrackets(r.into())),
                     h_text.map(|s| Inner::Text(s.into())),
                     parse_span.map(|s| Inner::Span(s.into())),
@@ -165,7 +164,7 @@ fn parse_black_branckets(input: &str) -> IResult<&str, (&str, Option<(Inner, cha
             opt((
                 alt((
                     parse_d_angle_brackets.map(|s| Inner::DAngleBrackets(DAngleBrackets(s.into()))),
-                    many1((parse_ruby, opt(kana.map(|s| s.to_string())))).map(|r| Inner::Ruby(r)),
+                    many1((parse_ruby, opt(kana.map(|s| s.to_string())))).map(Inner::Ruby),
                     parse_round_brackets.map(|r| Inner::RoundBrackets(r.into())),
                 )),
                 char('】'),
@@ -177,7 +176,7 @@ fn parse_black_branckets(input: &str) -> IResult<&str, (&str, Option<(Inner, cha
 
 fn parse_span(input: &str) -> IResult<&str, &str> {
     xml_tag("span", text)(input).and_then(|(rem, (attr, t))| {
-        if attr.len() == 0 {
+        if attr.is_empty() {
             Ok((rem, t))
         } else {
             Err(nom::Err::Error(ParseError::from_error_kind(
@@ -218,7 +217,7 @@ fn parse_refhead(input: &str) -> IResult<&str, Vec<RefHead>> {
         many1(alt((
             parse_refheadword.map(|s| RefHead::Refheadword(s.into())),
             parse_black_branckets
-                .map(|(b, d)| RefHead::BlackBranckets(b.into(), d.map(|(d, r)| (d, r.into())))),
+                .map(|(b, d)| RefHead::BlackBranckets(b.into(), d.map(|(d, r)| (d, r)))),
             parse_d_angle_brackets.map(|s| RefHead::DAngleBrackets(s.into())),
             parse_round_brackets.map(|s| RefHead::RoundBrackets(s.into())),
             parse_square_brackets.map(|s| RefHead::SquareBrackets(s.into())),
@@ -307,7 +306,7 @@ fn parse_text(input: &str) -> IResult<&str, &str> {
 fn parse_accent(input: &str) -> IResult<&str, Accent> {
     xml_tag(
         "span",
-        ((opt(parse_accent_head), parse_accent_text)).map(|(h, a)| Accent(h, a)),
+        (opt(parse_accent_head), parse_accent_text).map(|(h, a)| Accent(h, a)),
     )(input)
     .verify_class("accent")
 }

@@ -7,7 +7,7 @@ const CIRCLE: char = '\u{20dd}';
 const VOICED: char = '\u{309a}';
 const HALF_WIDTH_DAKUTEN: char = 'ﾞ';
 const HALF_WIDTH_HANDAKUTEN: char = 'ﾟ';
-const TEXT_STYLE: &'static str = "font-size:25px;font-family:sans-serif;fill:#fff;stroke:#000;stroke-width:2.2px;paint-order:stroke;";
+const TEXT_STYLE: &str = "font-size:25px;font-family:sans-serif;fill:#fff;stroke:#000;stroke-width:2.2px;paint-order:stroke;";
 
 pub fn gen_svg(accent_word: &str) -> String {
     let mut doc = Document::new();
@@ -105,7 +105,7 @@ pub fn gen_svg(accent_word: &str) -> String {
         let x: usize = 16 + ((last_i + 1) * 35);
         doc = draw_path(doc, x, 15, PathType::Down, 35);
         doc = draw_circle(doc, x, 15, false);
-        last_i = last_i + 1;
+        last_i += 1;
         for (i, _m) in mora
             .iter()
             .skip_while(|s| s.as_str() != "＼")
@@ -127,7 +127,7 @@ pub fn gen_svg(accent_word: &str) -> String {
         doc = draw_circle(doc, x, 40, true)
     }
 
-    println!("{}", doc.to_string());
+    println!("{}", doc);
     doc.to_string()
 }
 

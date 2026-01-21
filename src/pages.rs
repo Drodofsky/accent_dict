@@ -66,11 +66,11 @@ impl<'a> XmlParser<'a> {
                 }
                 _ => continue,
             }
-            if let Some((start, end)) = popped {
-                if Some(self.tag_stack.len()) < self.target_level {
-                    self.target_level = None;
-                    return Ok(Some(&self.xml[start..end]));
-                }
+            if let Some((start, end)) = popped
+                && Some(self.tag_stack.len()) < self.target_level
+            {
+                self.target_level = None;
+                return Ok(Some(&self.xml[start..end]));
             }
         }
         // No body fragment or item fragment with suitable ID found
@@ -111,12 +111,12 @@ impl Pages {
             parser.next_fragment_by(
                 |_| false,
                 |name, value| {
-                    if name == "id" {
-                        if let Some((page, item)) = value.split_once('-') {
-                            if page.parse() == Ok(id.page) && item.parse() == Ok(id.item) {
-                                return true;
-                            }
-                        }
+                    if name == "id"
+                        && let Some((page, item)) = value.split_once('-')
+                        && page.parse() == Ok(id.page)
+                        && item.parse() == Ok(id.item)
+                    {
+                        return true;
                     }
                     false
                 },

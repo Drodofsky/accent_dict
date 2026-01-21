@@ -42,7 +42,7 @@ pub(crate) unsafe trait TransmuteSafe: Default + Clone {
         if buf.len() < size_of::<Self>() {
             return Err(Error::Transmute);
         }
-        if buf.as_ptr() as usize % align_of::<Self>() != 0 {
+        if !(buf.as_ptr() as usize).is_multiple_of(align_of::<Self>()) {
             return Err(Error::Transmute);
         }
         let (me, tail) = buf.split_at(size_of::<Self>());
@@ -54,7 +54,7 @@ pub(crate) unsafe trait TransmuteSafe: Default + Clone {
         if buf.len() < n * size_of::<Self>() {
             return Err(Error::Transmute);
         }
-        if buf.as_ptr() as usize % align_of::<Self>() != 0 {
+        if !(buf.as_ptr() as usize).is_multiple_of(align_of::<Self>()) {
             return Err(Error::Transmute);
         }
         let tail = &buf[n * size_of::<Self>()..];
@@ -64,17 +64,12 @@ pub(crate) unsafe trait TransmuteSafe: Default + Clone {
 
     fn slice_as_bytes_mut(slice: &mut [Self]) -> &mut [u8] {
         unsafe {
-            slice::from_raw_parts_mut(
-                slice.as_mut_ptr() as *mut u8,
-                slice.len() * size_of::<Self>(),
-            )
+            slice::from_raw_parts_mut(slice.as_mut_ptr() as *mut u8, std::mem::size_of_val(slice))
         }
     }
 
     fn slice_as_bytes(slice: &[Self]) -> &[u8] {
-        unsafe {
-            slice::from_raw_parts(slice.as_ptr() as *const u8, slice.len() * size_of::<Self>())
-        }
+        unsafe { slice::from_raw_parts(slice.as_ptr() as *const u8, std::mem::size_of_val(slice)) }
     }
 
     fn as_bytes_mut(&mut self) -> &mut [u8] {
@@ -95,7 +90,7 @@ pub(crate) fn read_vec<T: TransmuteSafe>(
         return Ok(None);
     }
     // Replace this with div_ceil once it stabilizes
-    let size = (end - start + size_of::<T>() - 1) / size_of::<T>();
+    let size = (end - start).div_ceil(size_of::<T>());
     let mut buf = vec![T::default(); size];
     file.read_exact(T::slice_as_bytes_mut(&mut buf))?;
     Ok(Some(buf))

@@ -115,7 +115,7 @@ impl KeyIndex {
 impl Keys {
     fn check_vec_len(buf: &Option<Vec<LE32>>) -> Result<(), Error> {
         let Some(buf) = buf else { return Ok(()) };
-        if buf.get(0).ok_or(Error::InvalidIndex)?.us() + 1 != buf.len() {
+        if buf.first().ok_or(Error::InvalidIndex)?.us() + 1 != buf.len() {
             return Err(Error::InvalidIndex);
         }
         Ok(())
@@ -256,9 +256,9 @@ fn to_katakana(input: &str) -> Cow<'_, str> {
                 output.push(c);
             }
         }
-        return Cow::Owned(output);
+        Cow::Owned(output)
     } else {
-        return Cow::Borrowed(input);
+        Cow::Borrowed(input)
     }
 }
 
