@@ -223,19 +223,9 @@ fn str_to_mora(word: &str) -> Vec<String> {
     let little = "ぁぅぇぉゃゅょァゥェォャュョ";
     let mut mora: Vec<String> = Vec::new();
     for c in word.chars() {
-        if little.contains(c) {
-            let l = mora.len().saturating_sub(1);
-            mora[l].push(c)
-        } else if c == CIRCLE {
-            let l = mora.len().saturating_sub(1);
-            mora[l].push(c)
-        } else if c == VOICED {
-            let l = mora.len().saturating_sub(1);
-            mora[l].push(c)
-        } else if c == HALF_WIDTH_DAKUTEN {
-            let l = mora.len().saturating_sub(1);
-            mora[l].push(c)
-        } else if c == HALF_WIDTH_HANDAKUTEN {
+        if little.contains(c)
+            || [CIRCLE, VOICED, HALF_WIDTH_DAKUTEN, HALF_WIDTH_HANDAKUTEN].contains(&c)
+        {
             let l = mora.len().saturating_sub(1);
             mora[l].push(c)
         } else {

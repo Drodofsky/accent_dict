@@ -216,8 +216,7 @@ fn parse_refhead(input: &str) -> IResult<&str, Vec<RefHead>> {
         "span",
         many1(alt((
             parse_refheadword.map(|s| RefHead::Refheadword(s.into())),
-            parse_black_branckets
-                .map(|(b, d)| RefHead::BlackBranckets(b.into(), d)),
+            parse_black_branckets.map(|(b, d)| RefHead::BlackBranckets(b.into(), d)),
             parse_d_angle_brackets.map(|s| RefHead::DAngleBrackets(s.into())),
             parse_round_brackets.map(|s| RefHead::RoundBrackets(s.into())),
             parse_square_brackets.map(|s| RefHead::SquareBrackets(s.into())),
