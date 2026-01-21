@@ -89,21 +89,10 @@ class Dictionary:
         self.counter_menu = QMenu("助数詞", self.menubar)
         self.counter_menu.setFont(self.font)
         self.counter_menu.aboutToShow.connect(self.regenerated_actions)
-    
-        self.spacing = QWidget(self.menubar)
-        self.spacing.setFixedWidth(10)
 
         self.menubar.addMenu(self.headword_menu)
-
-        self.menubar.addSeparator()
-
         self.menubar.addMenu(self.compound_menu)
-
-        self.menubar.addSeparator()
-
         self.menubar.addMenu(self.counter_menu)
-        self.menubar.addSeparator()
-
 
         self.container_widget = QWidget(editor.widget)
         self.container_layout = QVBoxLayout()
