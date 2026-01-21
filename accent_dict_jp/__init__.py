@@ -53,6 +53,7 @@ _native = _load_native_module()
 look_up = _native.look_up
 get_sound = _native.get_sound
 gen_pitch_svg = _native.gen_pitch_svg
+WordType = _native.WordType
 
 
 def sanitise_str(s: str) -> str:
@@ -89,9 +90,19 @@ class Dictionary:
         self.counter_menu.setFont(self.font)
         self.counter_menu.aboutToShow.connect(self.regenerated_actions)
     
+        self.spacing = QWidget(self.menubar)
+        self.spacing.setFixedWidth(10)
+
         self.menubar.addMenu(self.headword_menu)
+
+        self.menubar.addSeparator()
+
         self.menubar.addMenu(self.compound_menu)
+
+        self.menubar.addSeparator()
+
         self.menubar.addMenu(self.counter_menu)
+        self.menubar.addSeparator()
 
 
         self.container_widget = QWidget(editor.widget)
@@ -169,7 +180,7 @@ class Dictionary:
         vocab_str = self.get_field("dict")
         vocabs = []
         if vocab_str is not None:
-            vocabs = look_up(self.get_assets_folder(), vocab_str)
+            vocabs = look_up(self.get_assets_folder(), vocab_str, WordType.HEADWORD)
         for vocab in vocabs:
             vocab_menu = QMenu(vocab.head, self.editor.parentWindow)
 
