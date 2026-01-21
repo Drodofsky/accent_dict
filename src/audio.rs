@@ -50,7 +50,7 @@ impl Audio {
         }
     }
 
-    pub fn get_by_idx(&mut self, idx: usize) -> Result<(AudioId, &[u8]), Error> {
+    pub fn get_by_idx(&mut self, idx: usize) -> Result<(AudioId<'_>, &[u8]), Error> {
         self.init()?;
         let Some(res) = self.res.as_mut() else {
             unreachable!()

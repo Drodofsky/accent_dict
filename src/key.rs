@@ -173,7 +173,7 @@ impl Keys {
         })
     }
 
-    fn get_page_iter(&self, pages_offset: usize) -> Result<PageIter, Error> {
+    fn get_page_iter(&self, pages_offset: usize) -> Result<PageIter<'_>, Error> {
         let pages = &LE32::slice_as_bytes(&self.words)[pages_offset..];
         PageIter::new(pages)
     }
@@ -245,7 +245,7 @@ impl Keys {
     }
 }
 
-fn to_katakana(input: &str) -> Cow<str> {
+fn to_katakana(input: &str) -> Cow<'_, str> {
     let diff = 'ア' as u32 - 'あ' as u32;
     if let Some(pos) = input.find(|c| matches!(c, 'ぁ'..='ん')) {
         let mut output = input[..pos].to_owned();

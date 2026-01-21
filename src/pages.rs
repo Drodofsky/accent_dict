@@ -125,7 +125,7 @@ impl Pages {
         .ok_or(Error::XmlError)
     }
 
-    pub fn get_item_audio(&mut self, id: PageItemId) -> Result<AudioIter, Error> {
+    pub fn get_item_audio(&mut self, id: PageItemId) -> Result<AudioIter<'_>, Error> {
         let xml = self.get_item(id)?;
         let parser = XmlParser::from(xml);
         Ok(AudioIter { parser })
