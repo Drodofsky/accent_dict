@@ -79,16 +79,16 @@ class Dictionary:
 
         self.headword_menu = QMenu("見出", self.menubar)
         self.headword_menu.setFont(self.font)
-        self.headword_menu.aboutToShow.connect(self.regenerated_actions)
+        self.headword_menu.aboutToShow.connect(self.regenerated_headword_action)
 
         
         self.compound_menu = QMenu("複合名詞", self.menubar)
         self.compound_menu.setFont(self.font)
-        self.compound_menu.aboutToShow.connect(self.regenerated_actions)
+        self.compound_menu.aboutToShow.connect(self.regenerated_compound_action)
 
         self.counter_menu = QMenu("助数詞", self.menubar)
         self.counter_menu.setFont(self.font)
-        self.counter_menu.aboutToShow.connect(self.regenerated_actions)
+        self.counter_menu.aboutToShow.connect(self.regenerated_counter_action)
 
         self.menubar.addMenu(self.headword_menu)
         self.menubar.addMenu(self.compound_menu)
@@ -164,7 +164,7 @@ class Dictionary:
         return path
     
 
-    def regenerated_actions(self):
+    def regenerated_headword_action(self):
         self.headword_menu.clear()
         vocab_str = self.get_field("dict")
         vocabs = []
@@ -182,6 +182,45 @@ class Dictionary:
                 vocab_menu.addAction(pron_action)
 
             self.headword_menu.addMenu(vocab_menu)
+
+    def regenerated_compound_action(self):
+        self.headword_menu.clear()
+        vocab_str = self.get_field("dict")
+        vocabs = []
+        if vocab_str is not None:
+            vocabs = look_up(self.get_assets_folder(), vocab_str, WordType.COMPOUND)
+        for vocab in vocabs:
+            vocab_menu = QMenu(vocab.head, self.editor.parentWindow)
+
+            for pron in vocab.pron:
+                pron_action = QAction(pron.accent, self.editor.parentWindow)
+                pron_action.setFont(self.font)
+                pron_action.triggered.connect(
+                    lambda _, id=vocab.id + '_' + pron.id, sound_file=pron.sound_file, pitch=pron.accent,
+                           voc=vocab.head: self.write_voc(id, sound_file, pitch, voc))
+                vocab_menu.addAction(pron_action)
+
+            self.compound_menu.addMenu(vocab_menu)
+
+    def regenerated_counter_action(self):
+        self.headword_menu.clear()
+        vocab_str = self.get_field("dict")
+        vocabs = []
+        if vocab_str is not None:
+            vocabs = look_up(self.get_assets_folder(), vocab_str, WordType.COUNTER)
+        for vocab in vocabs:
+            vocab_menu = QMenu(vocab.head, self.editor.parentWindow)
+
+            for pron in vocab.pron:
+                pron_action = QAction(pron.accent, self.editor.parentWindow)
+                pron_action.setFont(self.font)
+                pron_action.triggered.connect(
+                    lambda _, id=vocab.id + '_' + pron.id, sound_file=pron.sound_file, pitch=pron.accent,
+                           voc=vocab.head: self.write_voc(id, sound_file, pitch, voc))
+                vocab_menu.addAction(pron_action)
+
+            self.counter_menu.addMenu(vocab_menu)
+
 
 
 def create_dict(editor: Editor) -> None:
