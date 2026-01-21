@@ -184,7 +184,7 @@ class Dictionary:
             self.headword_menu.addMenu(vocab_menu)
 
     def regenerated_compound_action(self):
-        self.headword_menu.clear()
+        self.compound_menu.clear()
         vocab_str = self.get_field("dict")
         vocabs = []
         if vocab_str is not None:
@@ -203,7 +203,7 @@ class Dictionary:
             self.compound_menu.addMenu(vocab_menu)
 
     def regenerated_counter_action(self):
-        self.headword_menu.clear()
+        self.counter_menu.clear()
         vocab_str = self.get_field("dict")
         vocabs = []
         if vocab_str is not None:
