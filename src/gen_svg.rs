@@ -7,6 +7,7 @@ const CIRCLE: char = '\u{20dd}';
 const VOICED: char = '\u{309a}';
 const HALF_WIDTH_DAKUTEN: char = 'ﾞ';
 const HALF_WIDTH_HANDAKUTEN: char = 'ﾟ';
+const NAKATEN: char = '・';
 const TEXT_STYLE: &str = "font-size:25px;font-family:sans-serif;fill:#fff;stroke:#000;stroke-width:2.2px;paint-order:stroke;";
 
 pub fn gen_svg(accent_word: &str) -> String {
@@ -29,106 +30,123 @@ pub fn gen_svg(accent_word: &str) -> String {
         doc = draw_mora(doc, m, x.saturating_sub(11))
     }
 
-    // draw accent pattern
-    // heiban
-    if mora.last().unwrap() == "▔" {
-        doc = draw_path(doc, 16, 40, PathType::Up, 35);
-        doc = draw_circle(doc, 16, 40, false);
+    let mut start_x = 16;
 
-        for (i, m) in mora.iter().enumerate().skip(1) {
-            let x = 16 + (i * 35);
-            if m == "▔" {
-                doc = draw_circle(doc, x, 15, true)
-            } else {
-                doc = draw_path(doc, x, 15, PathType::Straight, 35);
-                doc = draw_circle(doc, x, 15, false)
-            }
+    let words = split_words(mora);
+    for word in words {
+        // draw accent pattern
+        if word.last().unwrap() == "▔" {
+            doc = draw_heiban(doc, &word, start_x);
+        } else if word.get(1).unwrap() == "＼" {
+            doc = draw_atama_daka(doc, &word, start_x);
+        } else if word.last().unwrap() == "＼" {
+            doc = draw_o_daka(doc, &word, start_x);
+        } else {
+            doc = draw_naka_daka(doc, &word, start_x);
         }
-    }
-    /* atama daka */
-    else if mora.get(1).unwrap() == "＼" {
-        doc = draw_path(doc, 16, 15, PathType::Down, 35);
-        doc = draw_circle(doc, 16, 15, false);
-        let mut last_i = 0;
-        for (i, _m) in mora
-            .iter()
-            .filter(|s| s.as_str() != "＼")
-            .enumerate()
-            .skip(1)
-        {
-            let x: usize = 16 + (i * 35);
-            last_i = i;
-            doc = draw_path(doc, x, 40, PathType::Straight, 35);
-            doc = draw_circle(doc, x, 40, false)
-        }
-        let x: usize = 16 + ((last_i + 1) * 35);
-        doc = draw_circle(doc, x, 40, true)
-    }
-    /* o daka */
-    else if mora.last().unwrap() == "＼" {
-        doc = draw_path(doc, 16, 40, PathType::Up, 35);
-        doc = draw_circle(doc, 16, 40, false);
-        let mut last_i = 0;
-        for (i, _m) in mora.iter().skip(2).enumerate().skip(1) {
-            let x: usize = 16 + (i * 35);
-            last_i = i;
-            doc = draw_path(doc, x, 15, PathType::Straight, 35);
-            doc = draw_circle(doc, x, 15, false)
-        }
-        let x: usize = 16 + ((last_i + 1) * 35);
 
-        doc = draw_path(doc, x, 15, PathType::Down, 35);
-
-        doc = draw_circle(doc, x, 15, false);
-
-        let x: usize = 16 + ((last_i + 2) * 35);
-        doc = draw_circle(doc, x, 40, true)
-    }
-    /* naka daka */
-    else {
-        doc = draw_path(doc, 16, 40, PathType::Up, 35);
-        doc = draw_circle(doc, 16, 40, false);
-        let mut last_i = 0;
-        let mut last_i2 = 0;
-        for (i, _m) in mora
-            .iter()
-            .take_while(|s| s.as_str() != "＼")
-            .skip(1)
-            .enumerate()
-            .skip(1)
-        {
-            let x: usize = 16 + (i * 35);
-            last_i = i;
-            doc = draw_path(doc, x, 15, PathType::Straight, 35);
-            doc = draw_circle(doc, x, 15, false)
-        }
-        let x: usize = 16 + ((last_i + 1) * 35);
-        doc = draw_path(doc, x, 15, PathType::Down, 35);
-        doc = draw_circle(doc, x, 15, false);
-        last_i += 1;
-        for (i, _m) in mora
-            .iter()
-            .skip_while(|s| s.as_str() != "＼")
-            .skip(1)
-            .enumerate()
-            .skip(1)
-        {
-            let x: usize = 16 + ((i + last_i) * 35);
-            last_i2 = i;
-            doc = draw_path(doc, x, 40, PathType::Straight, 35);
-            doc = draw_circle(doc, x, 40, false)
-        }
-        let x: usize = 16 + ((last_i + last_i2 + 1) * 35);
-        doc = draw_path(doc, x, 40, PathType::Straight, 35);
-
-        doc = draw_circle(doc, x, 40, false);
-
-        let x: usize = 16 + ((last_i + last_i2 + 2) * 35);
-        doc = draw_circle(doc, x, 40, true)
+        start_x += (word.len()) * 35;
     }
 
     println!("{}", doc);
     doc.to_string()
+}
+
+fn draw_heiban(mut doc: Document, mora: &[String], start_x: usize) -> Document {
+    doc = draw_path(doc, start_x, 40, PathType::Up, 35);
+    doc = draw_circle(doc, start_x, 40, false);
+
+    for (i, m) in mora.iter().enumerate().skip(1) {
+        let x = start_x + (i * 35);
+        if m == "▔" {
+            doc = draw_circle(doc, x, 15, true)
+        } else {
+            doc = draw_path(doc, x, 15, PathType::Straight, 35);
+            doc = draw_circle(doc, x, 15, false)
+        }
+    }
+    doc
+}
+
+fn draw_atama_daka(mut doc: Document, mora: &[String], start_x: usize) -> Document {
+    doc = draw_path(doc, start_x, 15, PathType::Down, 35);
+    doc = draw_circle(doc, start_x, 15, false);
+    let mut last_i = 0;
+    for (i, _m) in mora
+        .iter()
+        .filter(|s| s.as_str() != "＼")
+        .enumerate()
+        .skip(1)
+    {
+        let x: usize = start_x + (i * 35);
+        last_i = i;
+        doc = draw_path(doc, x, 40, PathType::Straight, 35);
+        doc = draw_circle(doc, x, 40, false)
+    }
+    let x: usize = start_x + ((last_i + 1) * 35);
+    draw_circle(doc, x, 40, true)
+}
+
+fn draw_o_daka(mut doc: Document, mora: &[String], start_x: usize) -> Document {
+    doc = draw_path(doc, start_x, 40, PathType::Up, 35);
+    doc = draw_circle(doc, start_x, 40, false);
+    let mut last_i = 0;
+    for (i, _m) in mora.iter().skip(2).enumerate().skip(1) {
+        let x: usize = start_x + (i * 35);
+        last_i = i;
+        doc = draw_path(doc, x, 15, PathType::Straight, 35);
+        doc = draw_circle(doc, x, 15, false)
+    }
+    let x: usize = start_x + ((last_i + 1) * 35);
+
+    doc = draw_path(doc, x, 15, PathType::Down, 35);
+
+    doc = draw_circle(doc, x, 15, false);
+
+    let x: usize = start_x + ((last_i + 2) * 35);
+    draw_circle(doc, x, 40, true)
+}
+
+fn draw_naka_daka(mut doc: Document, mora: &[String], start_x: usize) -> Document {
+    doc = draw_path(doc, start_x, 40, PathType::Up, 35);
+    doc = draw_circle(doc, start_x, 40, false);
+    let mut last_i = 0;
+    let mut last_i2 = 0;
+    for (i, _m) in mora
+        .iter()
+        .take_while(|s| s.as_str() != "＼")
+        .skip(1)
+        .enumerate()
+        .skip(1)
+    {
+        let x: usize = start_x + (i * 35);
+        last_i = i;
+        doc = draw_path(doc, x, 15, PathType::Straight, 35);
+        doc = draw_circle(doc, x, 15, false)
+    }
+    let x: usize = start_x + ((last_i + 1) * 35);
+    doc = draw_path(doc, x, 15, PathType::Down, 35);
+    doc = draw_circle(doc, x, 15, false);
+    last_i += 1;
+    for (i, _m) in mora
+        .iter()
+        .skip_while(|s| s.as_str() != "＼")
+        .skip(1)
+        .enumerate()
+        .skip(1)
+    {
+        let x: usize = start_x + ((i + last_i) * 35);
+        last_i2 = i;
+        doc = draw_path(doc, x, 40, PathType::Straight, 35);
+        doc = draw_circle(doc, x, 40, false)
+    }
+    let x: usize = start_x + ((last_i + last_i2 + 1) * 35);
+    doc = draw_path(doc, x, 40, PathType::Straight, 35);
+
+    doc = draw_circle(doc, x, 40, false);
+
+    let x: usize = start_x + ((last_i + last_i2 + 2) * 35);
+    draw_circle(doc, x, 40, true)
 }
 
 #[derive(Debug, PartialEq, Clone, Copy)]
@@ -219,6 +237,12 @@ fn draw_circle(mut doc: Document, xpos: usize, ypos: usize, is_next: bool) -> Do
     doc
 }
 
+fn split_words(mora: Vec<String>) -> Vec<Vec<String>> {
+    mora.split(|s| s.starts_with(NAKATEN))
+        .map(|c| c.to_vec())
+        .collect()
+}
+
 fn str_to_mora(word: &str) -> Vec<String> {
     let little = "ぁぅぇぉゃゅょァゥェォャュョ";
     let mut mora: Vec<String> = Vec::new();
@@ -265,5 +289,18 @@ mod tests {
             str_to_mora("キョク"),
             vec!["キョ".to_string(), "ク".to_string()]
         );
+    }
+    #[test]
+    fn nakaten_split() {
+        let test_str = str_to_mora("ジュ＼ー・ゴ＼ニチ");
+        assert_eq!(
+            split_words(test_str),
+            vec![vec!["ジュ", "＼", "ー"], vec!["ゴ", "＼", "ニ", "チ"]]
+        )
+    }
+    #[test]
+    fn gen_w() {
+        let test_str = "ジュ＼ー・ゴ＼ニチ";
+        gen_svg(test_str);
     }
 }
