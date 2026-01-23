@@ -16,6 +16,8 @@ import sys
 from aqt.utils import showCritical
 editor_dictionary_instance = {}
 
+svg_prefix = "pitch_v2_"
+
 
 def _select_native_lib() -> Optional[Path]:
     system = platform.system()
@@ -142,12 +144,12 @@ class Dictionary:
             return None
         if mw.col is None:
             return None
-        mw.col.media.write_data(sanitise_str(pitch) + ".svg", str.encode(pitch_svg))
+        mw.col.media.write_data(svg_prefix + sanitise_str(pitch) + ".svg", str.encode(pitch_svg))
 
     def write_voc(self, id: str, sound_file: Optional[str], pitch: str, voc: str) -> None:
         self.set_field("dict", id)
         self.set_field("voc", voc)
-        self.set_field("pitch", '<img src="' + sanitise_str(pitch) + '.svg">')
+        self.set_field("pitch", '<img src="'+ svg_prefix + sanitise_str(pitch) + '.svg">')
         self.save_pitch(pitch)
 
         if sound_file is not None:
