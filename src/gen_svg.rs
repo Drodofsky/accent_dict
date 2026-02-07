@@ -11,8 +11,9 @@ const NAKATEN: char = '・';
 const TEXT_STYLE: &str = "font-size:25px;font-family:sans-serif;fill:#fff;stroke:#000;stroke-width:2.2px;paint-order:stroke;";
 
 pub fn gen_svg(accent_word: &str) -> String {
+    dbg!(accent_word);
     let mut doc = Document::new();
-    let mora = str_to_mora(accent_word);
+    let mora = str_to_mora(accent_word.trim());
     let mora_len = mora.len();
     let svg_width = (mora_len.saturating_sub(1) * 35) + 32;
     doc = doc.set("width", svg_width);
@@ -302,5 +303,9 @@ mod tests {
     fn gen_w() {
         let test_str = "ジュ＼ー・ゴ＼ニチ";
         gen_svg(test_str);
+    }
+    #[test]
+    fn trim() {
+        assert_eq!(" ジューハ".trim(), "ジューハ")
     }
 }

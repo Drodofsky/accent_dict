@@ -191,7 +191,10 @@ pub enum AccentText {
 impl fmt::Display for AccentText {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            AccentText::Text(s) => write!(f, "{s}"),
+            AccentText::Text(s) => {
+                let s = s.trim();
+                write!(f, "{s}")
+            }
             AccentText::SymbolMacron(s) => write!(f, "{s}"),
             AccentText::SymbolBackslash(s) => write!(f, "{s}"),
             AccentText::RoundBox(s) => write!(f, "{}", to_circle(s)),
