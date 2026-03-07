@@ -236,6 +236,8 @@ impl Keys {
 
             match cmp {
                 Ordering::Less => low = mid + 1,
+                // panic panic_const_sub_overflow
+                // TODO check if target_key is empty
                 Ordering::Greater => high = mid - 1,
                 Ordering::Equal => return Ok((mid, self.get_idx(&self.index_prefix, mid)?.1)),
             }

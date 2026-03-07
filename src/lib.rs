@@ -48,6 +48,13 @@ fn accent_dict(m: &Bound<'_, PyModule>) -> PyResult<()> {
 }
 
 fn _look_up(path: &str, vocab: &str, word_type: Option<WordType>) -> Vec<Unpacked> {
+    if vocab.trim().is_empty() {
+        return vec![Unpacked {
+            id: "0".to_string(),
+            head: "<empty>".to_string(),
+            ..Default::default()
+        }];
+    }
     let mut dict = match MonokakidoDict::open_with_path(path) {
         Ok(dict) => dict,
         Err(_e) => return Vec::new(),
